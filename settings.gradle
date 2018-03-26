@@ -1,0 +1,4 @@
+rootProject.name = 'shelfs'
+include 'shelfs-api'
+include 'shelfs-test-plugin'
+

@@ -1,0 +1,7 @@
+/.idia/*
+*/libs/*
+*.json
+*/config/*
+*.xml
+*.properties
+*.jar

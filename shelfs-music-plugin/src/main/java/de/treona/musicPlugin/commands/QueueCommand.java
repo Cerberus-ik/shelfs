@@ -1,0 +1,69 @@
+package de.treona.musicPlugin.commands;
+
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import de.treona.musicPlugin.audio.AudioController;
+import de.treona.musicPlugin.audio.AudioUtils;
+import de.treona.musicPlugin.audio.GuildMusicManager;
+import de.treona.shelfs.commands.GuildCommand;
+import de.treona.shelfs.permission.Permission;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
+
+public class QueueCommand implements GuildCommand {
+
+    private AudioController audioController;
+
+    public QueueCommand(AudioController audioController) {
+        this.audioController = audioController;
+    }
+
+    @Override
+    public void execute(Member member, Message message, TextChannel textChannel) {
+        GuildMusicManager guildMusicManager = this.audioController.getMusicManager(member.getGuild());
+        if (guildMusicManager.scheduler.queue.size() == 0) {
+            textChannel.sendMessage("The queue is empty.").queue();
+            return;
+        }
+        int elementsToShow = 10;
+        if (guildMusicManager.scheduler.queue.size() < elementsToShow) {
+            elementsToShow = guildMusicManager.scheduler.queue.size();
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("There are ")
+                .append(guildMusicManager.scheduler.queue.size())
+                .append(" tracks in the queue.")
+                .append(System.lineSeparator());
+        int i = 1;
+        for (AudioTrack audioTrack : guildMusicManager.scheduler.queue) {
+            stringBuilder.append(System.lineSeparator())
+                    .append("Queue position: ``")
+                    .append(i)
+                    .append("`` ")
+                    .append(audioTrack.getInfo().title)
+                    .append(" ``(")
+                    .append(AudioUtils.formatDuration(audioTrack.getDuration()))
+                    .append(")``");
+            if (i == elementsToShow) {
+                break;
+            }
+            i++;
+        }
+        textChannel.sendMessage(stringBuilder.toString()).queue();
+    }
+
+    @Override
+    public String getName() {
+        return "Queue";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Shows you the current queue of the music bot.";
+    }
+
+    @Override
+    public Permission getPermission() {
+        return null;
+    }
+}
