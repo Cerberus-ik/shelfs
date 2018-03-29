@@ -38,6 +38,7 @@ public class PluginLoader {
             ShelfsPlugin shelfsPlugin = (ShelfsPlugin) factory.create(jarClassLoader, pluginDescription.getMain());
             shelfsPlugin.getClass().getSuperclass().getField("pluginDescription").set(shelfsPlugin, pluginDescription);
             shelfsPlugin.getClass().getSuperclass().getField("logger").set(shelfsPlugin, new Logger(shelfsPlugin));
+            Shelfs.getLogger().logMessage("Loaded: " + shelfsPlugin.getPluginDescription().getName() + " v" + shelfsPlugin.getPluginDescription().getVersion(), LogLevel.INFO);
             return shelfsPlugin;
         } catch (InvalidPluginDescriptionException | IllegalAccessException | NoSuchFieldException | MalformedURLException e) {
             e.printStackTrace();

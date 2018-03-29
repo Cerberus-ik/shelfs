@@ -58,7 +58,6 @@ public final class Shelfs {
                     .setToken(configManager.getConfig().token)
                     .addEventListener(new Listener(configManager.getConfig().commandPrefix))
                     .setAudioSendFactory(new NativeAudioSendFactory())
-                    //.setAudioSendFactory(new ShelfsAudioSendFactory())
                     .buildBlocking());
         } catch (LoginException | InterruptedException e) {
             e.printStackTrace();
@@ -80,7 +79,7 @@ public final class Shelfs {
     }
 
     public static String getVersion() {
-        return "0.2.0";
+        return "0.2.1";
     }
 
     public static JDA getJda() {

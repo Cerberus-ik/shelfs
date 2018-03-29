@@ -54,10 +54,6 @@ public class CommandManager {
         return this.commands.get(this.getCommandDataFromCommand(command)).getPermission();
     }
 
-    public void setCommandPrefix(String commandPrefix) {
-        this.commandPrefix = commandPrefix;
-    }
-
     public void registerCommand(ShelfsPlugin plugin, String trigger, Command command) {
         if (this.commands.values().contains(command)) {
             throw new IllegalStateException("Command is already registered.");
@@ -93,7 +89,8 @@ public class CommandManager {
             return;
         }
         String trigger = rawMessage[0].replaceFirst(this.commandPrefix, "");
-        if (this.commands.keySet().stream().noneMatch(commandData -> commandData.trigger.equalsIgnoreCase(trigger))) {
+        if (this.commands.values().stream().noneMatch(command -> this.isCorrectCommandType(command, channel))
+                || this.commands.keySet().stream().noneMatch(commandData -> commandData.trigger.equalsIgnoreCase(trigger))) {
             return;
         }
         CommandData commandData = this.commands
@@ -107,11 +104,28 @@ public class CommandManager {
             channel.sendMessage("Sorry but you don't have enough permission to execute this command.").queue();
             return;
         }
-        if (command instanceof GuildCommand) {
+        if (channel instanceof TextChannel) {
             ((GuildCommand) command).execute(message.getMember(), message, (TextChannel) channel);
-        } else if (command instanceof PrivateCommand) {
+        } else {
             ((PrivateCommand) command).execute(message.getAuthor(), message, (PrivateChannel) channel);
         }
+    }
+
+    private boolean isCorrectCommandType(Command command, MessageChannel messageChannel) {
+        if (messageChannel instanceof PrivateChannel) {
+            return command instanceof PrivateCommand;
+        } else if (messageChannel instanceof TextChannel) {
+            return command instanceof GuildCommand;
+        }
+        return false;
+    }
+
+    public String getCommandPrefix() {
+        return this.commandPrefix;
+    }
+
+    public void setCommandPrefix(String commandPrefix) {
+        this.commandPrefix = commandPrefix;
     }
 
     private class CommandData {

@@ -87,11 +87,11 @@ public class NowPlayingCommand implements GuildCommand {
         double length = audioTrack.getDuration();
         int part = (int) Math.round(position / length * 10);
         for (int i = 0; i < part; i++) {
-            stringBuilder.append("➖");
+            stringBuilder.append("▬");
         }
         stringBuilder.append("⭕**");
         for (int i = part; i < 10; i++) {
-            stringBuilder.append("➖");
+            stringBuilder.append("▬");
         }
         stringBuilder.append("**");
         stringBuilder.append(String.format("``[%s-%s]``",

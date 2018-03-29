@@ -27,11 +27,12 @@ public class RestartCommand implements GuildCommand {
         GuildMusicManager guildMusicManager = this.audioController.getMusicManager(member.getGuild());
         if (guildMusicManager.player.getPlayingTrack() != null) {
             guildMusicManager.player.playTrack(guildMusicManager.player.getPlayingTrack());
+            AudioUtils.sendPlayInfoToDJ(textChannel, guildMusicManager.scheduler.lastTrack);
         } else if (guildMusicManager.scheduler.lastTrack == null) {
             textChannel.sendMessage("No track got played so far.").queue();
         } else {
-            guildMusicManager.player.playTrack(guildMusicManager.scheduler.lastTrack);
-            AudioUtils.sendInfoToDJ(textChannel, guildMusicManager.scheduler.lastTrack);
+            guildMusicManager.player.playTrack(guildMusicManager.scheduler.lastTrack.makeClone());
+            AudioUtils.sendPlayInfoToDJ(textChannel, guildMusicManager.scheduler.lastTrack.makeClone());
         }
     }
 

@@ -56,9 +56,17 @@ public class SettingsCommand implements GuildCommand {
             }
         } else if (setting.equalsIgnoreCase("autoPlayList")) {
             String url = args[args.length - 1];
+            GuildSettings guildSettings = this.configManager.getGuildSettings(member.getGuild());
+            if (url.equalsIgnoreCase("autoPlaylist")) {
+                if (guildSettings.getAutoPlaylist() == null || guildSettings.getAutoPlaylist().length() < 4) {
+                    textChannel.sendMessage("You have no auto playlist set.").queue();
+                    return;
+                }
+                textChannel.sendMessage("Your auto playlist: " + guildSettings.getAutoPlaylist()).queue();
+                return;
+            }
             TemporaryPlayer temporaryPlayer = this.audioController.generateTemporaryPlayer();
             if (temporaryPlayer.isValidPlaylist(url)) {
-                GuildSettings guildSettings = this.configManager.getGuildSettings(member.getGuild());
                 guildSettings.setAutoPlaylist(url);
                 this.configManager.saveGuildSettings(member.getGuild(), guildSettings);
                 textChannel.sendMessage("Auto playlist got set successfully.").queue();

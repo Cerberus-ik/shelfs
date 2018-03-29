@@ -30,7 +30,7 @@ public class TrackScheduler extends AudioEventAdapter {
         this.guildMusicManager = guildMusicManager;
         this.audioController = audioController;
         this.autoPlaylist = autoPlaylist;
-        if (textChannel == null) {
+        if (textChannel == null && guildMusicManager != null) {
             this.textChannel = guildMusicManager.getGuild().getDefaultChannel();
         } else {
             this.textChannel = textChannel;
@@ -50,22 +50,25 @@ public class TrackScheduler extends AudioEventAdapter {
      * Start the next track, stopping the current one if it is playing.
      */
     public void nextTrack() {
-        if (this.queue.poll() == null) {
+        AudioTrack audioTrack = this.queue.poll();
+        if (audioTrack == null && this.autoPlaylist != null) {
+            AudioUtils.sendAutoPlaylistInformation(this.textChannel, "<" + this.autoPlaylist + ">");
             this.audioController.loadAndPlay(this.guildMusicManager,
                     this.textChannel,
                     this.autoPlaylist,
                     true);
+            this.shuffle();
+            audioTrack = this.queue.poll();
         }
-        AudioTrack audioTrack = queue.poll();
         if (audioTrack == null) {
-            if (this.autoPlaylist != null) {
-                textChannel.sendMessage("Could not start the auto playlist.").queue();
+            if (this.autoPlaylist != null && this.autoPlaylist.length() > 2) {
+                this.textChannel.sendMessage("Could not start the auto playlist.").queue();
                 Shelfs.getLogger().logMessage("Warning auto playlist is set but no tracks got loaded.", LogLevel.WARNING);
             }
             return;
         }
-        player.startTrack(audioTrack, false);
-        AudioUtils.sendInfoToDJ(textChannel, audioTrack);
+        this.player.startTrack(audioTrack, false);
+        AudioUtils.sendPlayInfoToDJ(textChannel, audioTrack);
     }
 
     @Override
@@ -90,6 +93,6 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public void shuffle() {
-        Collections.shuffle((List<?>) queue);
+        Collections.shuffle((List<?>) this.queue);
     }
 }

@@ -32,16 +32,26 @@ public class PlayCommand implements GuildCommand {
             if (player.isPaused()) {
                 player.setPaused(false);
                 textChannel.sendMessage("Playback as been resumed.").queue();
-            } else if (trackScheduler.queue.isEmpty()) {
-                textChannel.sendMessage("The current audio queue is empty! Add something to the queue first!").queue();
+            }
+            if (player.getPlayingTrack() == null) {
+                trackScheduler.nextTrack();
+                AudioUtils.joinMember(member);
             }
         } else {
             if (!AudioUtils.joinMember(member) && !member.getGuild().getAudioManager().isConnected()) {
                 textChannel.sendMessage("I have no place to play my music :(").queue();
                 return;
             }
-            this.audioController.loadAndPlay(this.audioController.getMusicManager(member.getGuild()),
-                    textChannel, args[1], false);
+            if (args.length > 2 && args[1].equalsIgnoreCase("now")) {
+                this.audioController.loadAndPlayNow(this.audioController.getMusicManager(member.getGuild()),
+                        textChannel, args[2], false);
+            } else if (args.length > 2 && args[1].equalsIgnoreCase("next")) {
+                this.audioController.loadAndPlayNext(this.audioController.getMusicManager(member.getGuild()),
+                        textChannel, args[2], false);
+            } else {
+                this.audioController.loadAndPlay(this.audioController.getMusicManager(member.getGuild()),
+                        textChannel, args[1], false);
+            }
         }
     }
 

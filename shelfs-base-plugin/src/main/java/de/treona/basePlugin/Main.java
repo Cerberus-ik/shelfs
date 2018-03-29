@@ -4,7 +4,6 @@ import de.treona.basePlugin.commands.*;
 import de.treona.basePlugin.config.ConfigManager;
 import de.treona.shelfs.api.Shelfs;
 import de.treona.shelfs.api.plugin.ShelfsPlugin;
-import de.treona.shelfs.io.logger.LogLevel;
 import de.treona.shelfs.permission.RolePermission;
 import net.dv8tion.jda.core.entities.Role;
 import org.json.JSONObject;
@@ -13,7 +12,6 @@ public class Main extends ShelfsPlugin {
 
     @Override
     public void onEnable() {
-        super.getLogger().logMessage("Base-Plugin is starting...", LogLevel.INFO);
         ConfigManager configManager = new ConfigManager(this);
         JSONObject config = configManager.loadConfig();
         Role loadRole = Shelfs.getJda().getRoleById(config.getString("pluginLoadRequiredRole"));

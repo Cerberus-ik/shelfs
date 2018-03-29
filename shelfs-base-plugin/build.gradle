@@ -13,5 +13,5 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile files('libs/shelfs-api-v0.1.0.jar')
+    compile group: 'cerberus', name: 'shelfs-api', version: '0.2.1'
 }

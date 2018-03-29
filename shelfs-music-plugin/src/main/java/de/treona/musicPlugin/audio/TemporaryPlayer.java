@@ -35,7 +35,6 @@ public class TemporaryPlayer {
 
             @Override
             public void playlistLoaded(AudioPlaylist playlist) {
-                System.out.println(1);
                 List<AudioTrack> tracks = playlist.getTracks();
                 tracks.forEach(scheduler::queue);
             }
@@ -49,7 +48,7 @@ public class TemporaryPlayer {
             }
         });
         try {
-            future.get(5000, TimeUnit.MILLISECONDS);
+            future.get(10000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             e.printStackTrace();
         }

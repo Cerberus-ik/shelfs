@@ -1,6 +1,7 @@
 package de.treona.shelfs.api.plugin;
 
 import de.treona.shelfs.api.Shelfs;
+import de.treona.shelfs.io.logger.LogLevel;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class PluginManager {
             throw new IllegalStateException("Plugin is already loaded.");
         }
         this.plugins.put(shelfsPlugin, true);
+        Shelfs.getLogger().logMessage("Enabling " + shelfsPlugin.getPluginDescription().getName() + "...", LogLevel.INFO);
         shelfsPlugin.onEnable();
     }
 

@@ -1,7 +1,6 @@
 package de.treona.musicPlugin.commands;
 
 import de.treona.musicPlugin.audio.AudioController;
-import de.treona.musicPlugin.audio.GuildMusicManager;
 import de.treona.musicPlugin.permission.AudioPermissionUtil;
 import de.treona.shelfs.commands.GuildCommand;
 import de.treona.shelfs.permission.Permission;
@@ -23,7 +22,6 @@ public class ShuffleCommand implements GuildCommand {
             textChannel.sendMessage("Sorry but you don't have the permission to use this command.").queue();
             return;
         }
-        GuildMusicManager guildMusicManager = this.audioController.getMusicManager(member.getGuild());
         this.audioController.getMusicManager(textChannel.getGuild()).scheduler.shuffle();
         textChannel.sendMessage("Queue got shuffled.").queue();
     }

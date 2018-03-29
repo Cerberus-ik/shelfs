@@ -1,7 +1,8 @@
 apply plugin: 'maven-publish'
-group 'Cerberus'
-version 'v0.2.0'
+group 'cerberus'
+version '0.2.1'
 
+apply plugin: 'maven-publish'
 apply plugin: 'java'
 
 sourceCompatibility = 1.8
@@ -23,10 +24,18 @@ dependencies {
     compile 'com.sedmelluq:jda-nas:1.0.5'
 }
 
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
+
+            artifact sourceJar {
+                classifier "sources"
+            }
         }
     }
 }
