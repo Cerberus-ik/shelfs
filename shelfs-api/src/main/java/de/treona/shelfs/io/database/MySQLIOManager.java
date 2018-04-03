@@ -4,11 +4,15 @@ import com.mysql.cj.jdbc.MysqlDataSource;
 import de.treona.shelfs.api.Shelfs;
 import de.treona.shelfs.io.IOManager;
 import de.treona.shelfs.io.logger.LogLevel;
+import de.treona.shelfs.permission.Permission;
+import de.treona.shelfs.permission.StringPermission;
 import net.dv8tion.jda.core.entities.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MySQLIOManager implements IOManager {
@@ -22,6 +26,12 @@ public class MySQLIOManager implements IOManager {
         this.dataSource.setPassword(databaseCredentials.getPassword());
         this.dataSource.setServerName(databaseCredentials.getHost());
         this.dataSource.setPort(databaseCredentials.getPort());
+        try {
+            this.dataSource.setServerTimezone("UTC");
+            //TODO add time zone support
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         //this.dataSource.setURL("jdbc:mysql://" + databaseCredentials.getHost() + "/" + databaseCredentials.getDatabase() + "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC");
         this.dataSource.setURL("jdbc:mysql://" + databaseCredentials.getHost() + "/" + databaseCredentials.getDatabase());
     }
@@ -85,23 +95,80 @@ public class MySQLIOManager implements IOManager {
     }
 
     @Override
-    public void addPermission(User user, String permission) {
-
+    public void addPermission(User user, Permission permission) {
+        if (!(permission instanceof StringPermission)) {
+            throw new IllegalArgumentException("Only string permissions are supported here.");
+        }
+        StringPermission stringPermission = (StringPermission) permission;
+        try {
+            Connection connection = this.dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO permissions (permissionName, userId) VALUES (?, ?);");
+            preparedStatement.setString(1, stringPermission.getPermission());
+            preparedStatement.setString(2, user.getId());
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            connection.close();
+            preparedStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void removePermission(User user, String permission) {
-
+        try {
+            Connection connection = this.dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM permissions WHERE permissionName = ? AND userId = ? LIMIT 1");
+            preparedStatement.setString(1, permission);
+            preparedStatement.setString(2, user.getId());
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            connection.close();
+            preparedStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public boolean hasPermission(User user, String permission) {
-        return false;
+        boolean returnValue = false;
+        try {
+            Connection connection = this.dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT permissionName FROM permissions WHERE userId = ? AND permissionName = ?;");
+            preparedStatement.setString(1, user.getId());
+            preparedStatement.setString(2, permission);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next())
+                returnValue = true;
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+            preparedStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return returnValue;
     }
 
     @Override
-    public List<String> getPermissions(User user) {
-        return null;
+    public List<StringPermission> getPermissions(User user) {
+        List<StringPermission> permissions = new ArrayList<>();
+        try {
+            Connection connection = this.dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT permissionName FROM permissions WHERE userId = ?;");
+            preparedStatement.setString(1, user.getId());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next())
+                permissions.add(new StringPermission(resultSet.getString(1)));
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+            preparedStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return permissions;
     }
 
     @Override

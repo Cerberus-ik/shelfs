@@ -50,6 +50,6 @@ public class ShelfsPlugin {
     }
 
     public void writeDefaultConfig() {
-
+        this.saveConfig(this.getDefaultConfig());
     }
 }

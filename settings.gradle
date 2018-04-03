@@ -3,4 +3,5 @@ include 'shelfs-api'
 include 'shelfs-test-plugin'
 include 'util-plugin'
 include 'shelfs-util-plugin'
+include 'shelfs-update-plugin'
 

@@ -5,6 +5,10 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class PermissionUtil {
 
     /**
@@ -66,5 +70,36 @@ public class PermissionUtil {
             return hasPermission(user, (StringPermission) permission);
         }
         return false;
+    }
+
+    /**
+     * Will add a @{@link StringPermission} to a user. If you want to add a @{@link RolePermission}
+     * use the @{@link net.dv8tion.jda.core.managers.GuildController}.
+     *
+     * @param user             will get the @{@link StringPermission}.
+     * @param stringPermission the @{@link StringPermission} that will get granted to the user.
+     */
+    public static void addPermission(User user, StringPermission stringPermission) {
+        Shelfs.getIoManager().addPermission(user, stringPermission);
+    }
+
+    /**
+     * Removes the given @{@link StringPermission} again from a user.
+     *
+     * @param user             that is targeted.
+     * @param stringPermission will get removed from the user.
+     */
+    public static void removePermission(User user, StringPermission stringPermission) {
+        Shelfs.getIoManager().removePermission(user, stringPermission.getPermission());
+    }
+
+    /**
+     * Returns all users that have the given @{@link Permission}
+     *
+     * @param permission to check for.
+     * @return all users that have the given @{@link Permission}
+     */
+    public static List<User> getUsersWithPermission(Permission permission) {
+        return Shelfs.getJda().getUsers().parallelStream().filter(user -> PermissionUtil.hasPermission(user, permission)).collect(Collectors.toList());
     }
 }

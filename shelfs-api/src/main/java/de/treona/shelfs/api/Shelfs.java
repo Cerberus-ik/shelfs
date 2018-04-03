@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import javax.security.auth.login.LoginException;
 import java.io.*;
 
+@SuppressWarnings("unused")
 public final class Shelfs {
 
     private static JDA jda;
@@ -79,7 +80,7 @@ public final class Shelfs {
     }
 
     public static String getVersion() {
-        return "0.2.1";
+        return "0.2.3";
     }
 
     public static JDA getJda() {
