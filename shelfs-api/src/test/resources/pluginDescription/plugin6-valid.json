@@ -1,0 +1,10 @@
+{
+  "author": "Cerberus",
+  "name": "Test3",
+  "version": "1.0.0",
+  "main": "de.treona.test.Main",
+  "dependencies": [
+    "dependency1",
+    "dependency2"
+  ]
+}

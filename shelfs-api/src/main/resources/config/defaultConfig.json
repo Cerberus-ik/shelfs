@@ -1,0 +1,15 @@
+{
+  "currentGame": "Shelfs",
+  "onlineStatus": "Online",
+  "pluginDirectory": "plugins",
+  "token": "token",
+  "commandPrefix": "!",
+  "io": "MySQL",
+  "database": {
+    "ioPassword": "",
+    "ioUser": "",
+    "ioDb": "",
+    "ioHost": "",
+    "ioPort": "3306"
+  }
+}
