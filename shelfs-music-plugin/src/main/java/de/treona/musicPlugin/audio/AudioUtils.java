@@ -176,19 +176,4 @@ public class AudioUtils {
         else
             return String.format("%02d:%02d", minutes, seconds);
     }
-
-    public static String getArguments(String message) {
-        String[] args = message.split(" ");
-        if (args.length == 0) {
-            return "";
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 1; i < args.length; i++) {
-            stringBuilder.append(args[i]);
-            if (i - 1 != args.length) {
-                stringBuilder.append(" ");
-            }
-        }
-        return stringBuilder.toString();
-    }
 }

@@ -22,7 +22,7 @@ public class TemporaryPlayer {
     TemporaryPlayer(AudioPlayerManager audioPlayerManager) {
         this.audioPlayerManager = audioPlayerManager;
         this.player = audioPlayerManager.createPlayer();
-        this.scheduler = new TrackScheduler(player, null, null, null, null);
+        this.scheduler = new TrackScheduler(player, null, null, null, null, null);
         this.player.addListener(scheduler);
     }
 

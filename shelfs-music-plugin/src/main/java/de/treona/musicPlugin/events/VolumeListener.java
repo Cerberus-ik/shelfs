@@ -52,9 +52,6 @@ public class VolumeListener extends ListenerAdapter {
             guildSettings.setVolume(newVolume);
             this.configManager.saveGuildSettings(event.getGuild(), guildSettings);
         }
-        //if(event.getReactionEmote().getEmote().getId().equals(""))
-        //GuildMusicManager guildMusicManager = this.audioController.getMusicManager(event.getGuild());
-        //guildMusicManager.pl
     }
 
 }

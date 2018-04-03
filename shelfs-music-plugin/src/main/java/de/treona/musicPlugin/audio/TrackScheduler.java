@@ -6,12 +6,15 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import de.treona.shelfs.api.Shelfs;
 import de.treona.shelfs.io.logger.LogLevel;
+import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+
+import static java.lang.Thread.sleep;
 
 public class TrackScheduler extends AudioEventAdapter {
 
@@ -23,13 +26,15 @@ public class TrackScheduler extends AudioEventAdapter {
     private String autoPlaylist;
     private AudioController audioController;
     private TextChannel textChannel;
+    private Guild guild;
 
-    TrackScheduler(AudioPlayer player, GuildMusicManager guildMusicManager, AudioController audioController, String autoPlaylist, TextChannel textChannel) {
+    TrackScheduler(AudioPlayer player, GuildMusicManager guildMusicManager, AudioController audioController, String autoPlaylist, TextChannel textChannel, Guild guild) {
         this.player = player;
         this.queue = new LinkedList<>();
         this.guildMusicManager = guildMusicManager;
         this.audioController = audioController;
         this.autoPlaylist = autoPlaylist;
+        this.guild = guild;
         if (textChannel == null && guildMusicManager != null) {
             this.textChannel = guildMusicManager.getGuild().getDefaultChannel();
         } else {
@@ -80,8 +85,31 @@ public class TrackScheduler extends AudioEventAdapter {
                 player.startTrack(lastTrack.makeClone(), false);
             else
                 this.nextTrack();
+        } else {
+            this.startLeaveRunnable(1000 * 10);
         }
+    }
 
+    @Override
+    public void onPlayerPause(AudioPlayer player) {
+        this.startLeaveRunnable(1000 * 60);
+    }
+
+    private void startLeaveRunnable(int milliSeconds) {
+        new Thread(() -> {
+            if (!this.guild.getAudioManager().isConnected()) {
+                return;
+            }
+            try {
+                sleep(milliSeconds);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (player.getPlayingTrack() != null) {
+                return;
+            }
+            this.guild.getAudioManager().closeAudioConnection();
+        }).start();
     }
 
     public boolean isRepeating() {

@@ -104,7 +104,6 @@ public class SettingsCommand implements GuildCommand {
             embedBuilder.addField("Volume", String.valueOf(guildSettings.getVolume()), true);
             textChannel.sendMessage(embedBuilder.build()).queue();
         } else {
-            System.out.println(setting);
             textChannel.sendMessage("That's not a valid setting.").queue();
         }
     }
