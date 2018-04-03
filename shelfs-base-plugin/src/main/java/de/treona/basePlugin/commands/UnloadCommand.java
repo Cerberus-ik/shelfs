@@ -32,7 +32,6 @@ public class UnloadCommand implements GuildCommand, PrivateCommand {
 
     private void unload(MessageChannel channel, String message) {
         String name = this.getPluginName(message);
-        System.out.println(name);
         List<ShelfsPlugin> plugins = Shelfs.getPluginManager().getPlugins().stream()
                 .filter(plugin -> plugin.getPluginDescription().getName().equalsIgnoreCase(name))
                 .collect(Collectors.toList());

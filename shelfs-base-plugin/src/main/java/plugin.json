@@ -1,0 +1,7 @@
+{
+  "author": "Cerberus",
+  "version": "1.0.3",
+  "name": "Base-Plugin",
+  "main": "de.treona.basePlugin.Main",
+  "pluginDescription": "The basic shelfs plugin"
+}

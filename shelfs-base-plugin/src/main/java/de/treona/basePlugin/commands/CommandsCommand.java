@@ -1,6 +1,8 @@
 package de.treona.basePlugin.commands;
 
 import de.treona.shelfs.api.Shelfs;
+import de.treona.shelfs.api.plugin.ShelfsPlugin;
+import de.treona.shelfs.commands.Command;
 import de.treona.shelfs.commands.GuildCommand;
 import de.treona.shelfs.commands.PrivateCommand;
 import de.treona.shelfs.permission.Permission;
@@ -10,12 +12,17 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.*;
 
 import java.awt.*;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+@SuppressWarnings("unchecked")
 public class CommandsCommand implements GuildCommand, PrivateCommand {
 
     @Override
     public void execute(Member member, Message message, TextChannel textChannel) {
-        Object messageObject = this.buildMessage();
+        String[] args = message.getContentRaw().split(" ");
+        Object messageObject = this.buildMessage(this.getPredicate(args, textChannel));
         if (messageObject instanceof String) {
             textChannel.sendMessage((String) messageObject).queue();
         } else {
@@ -25,7 +32,8 @@ public class CommandsCommand implements GuildCommand, PrivateCommand {
 
     @Override
     public void execute(User user, Message message, PrivateChannel privateChannel) {
-        Object messageObject = this.buildMessage();
+        String[] args = message.getContentRaw().split(" ");
+        Object messageObject = this.buildMessage(this.getPredicate(args, privateChannel));
         if (messageObject instanceof String) {
             privateChannel.sendMessage((String) messageObject).queue();
         } else {
@@ -33,18 +41,41 @@ public class CommandsCommand implements GuildCommand, PrivateCommand {
         }
     }
 
-    private Object buildMessage() {
+    private Predicate getPredicate(String[] args, MessageChannel channel) {
+        Predicate<? super Command> predicate = command -> true;
+        if (args.length > 1) {
+            List<ShelfsPlugin> plugins = Shelfs.getPluginManager()
+                    .getPlugins().stream()
+                    .filter(plugin -> plugin.getPluginDescription().getName().equalsIgnoreCase(args[1]))
+                    .collect(Collectors.toList());
+            if (plugins.size() == 0) {
+                channel.sendMessage("There is no plugin with that name.").queue();
+                return null;
+            }
+            predicate = command -> Shelfs.getCommandManager()
+                    .getPluginFromCommand(command)
+                    .getPluginDescription().getName().equalsIgnoreCase(args[1]);
+        }
+        return predicate;
+    }
+
+    private Object buildMessage(Predicate<? super Command> predicate) {
         if (Shelfs.getCommandManager().getCommands().size() > 20) {
-            return this.buildSimpleMessage();
+            return this.buildSimpleMessage(predicate);
         } else {
-            return this.buildEmbedMessage();
+            return this.buildEmbedMessage(predicate);
         }
     }
 
-    private String buildSimpleMessage() {
+    private String buildSimpleMessage(Predicate<? super Command> predicate) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Available commands: ").append(Shelfs.getCommandManager().getCommands().size());
-        Shelfs.getCommandManager().getCommands().forEach(command -> {
+        List<Command> commands = Shelfs.getCommandManager().getCommands().stream().filter(predicate).collect(Collectors.toList());
+        stringBuilder.append("Available commands: ")
+                .append(commands.size())
+                .append(" (")
+                .append(Shelfs.getCommandManager().getCommands().size())
+                .append(")");
+        Shelfs.getCommandManager().getCommands().stream().filter(predicate).forEach(command -> {
             stringBuilder.append(System.lineSeparator());
             stringBuilder.append(command.getName())
                     .append(" from: ")
@@ -56,11 +87,12 @@ public class CommandsCommand implements GuildCommand, PrivateCommand {
         return stringBuilder.toString();
     }
 
-    private MessageEmbed buildEmbedMessage() {
+    private MessageEmbed buildEmbedMessage(Predicate<? super Command> predicate) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
-        embedBuilder.setTitle("Available commands: " + Shelfs.getCommandManager().getCommands().size());
+        List<Command> commands = Shelfs.getCommandManager().getCommands().stream().filter(predicate).collect(Collectors.toList());
+        embedBuilder.setTitle("Available commands: " + commands.size() + " (" + Shelfs.getCommandManager().getCommands().size() + ")");
         embedBuilder.setColor(Color.ORANGE);
-        Shelfs.getCommandManager().getCommands().stream().filter(command -> command.getName() != null && command.getDescription() != null).forEach(
+        Shelfs.getCommandManager().getCommands().stream().filter(predicate).forEach(
                 command -> embedBuilder.addField(command.getName()
                                 + " from: "
                                 + Shelfs.getCommandManager().getPluginFromCommand(command).getPluginDescription().getName(),
