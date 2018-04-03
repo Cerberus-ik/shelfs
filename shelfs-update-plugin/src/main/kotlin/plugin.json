@@ -1,0 +1,7 @@
+{
+  "author": "Cerberus",
+  "version": "0.1.0",
+  "name": "Update-Plugin",
+  "main": "de.treona.updatePlugin.Main",
+  "pluginDescription": "Reminds you when a bot or a plugin receives an update."
+}
