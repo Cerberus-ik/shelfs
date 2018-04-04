@@ -18,6 +18,8 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -30,7 +32,7 @@ public class AudioController extends ListenerAdapter {
     private final AudioPlayerManager playerManager;
     private final Map<String, GuildMusicManager> musicManagers;
     private ConfigManager configManager;
-    private final int TIMEOUT = 10000;
+    private final int TIMEOUT = 25000;
 
     public AudioController(ConfigManager configManager) {
         this.playerManager = new DefaultAudioPlayerManager();
@@ -47,7 +49,8 @@ public class AudioController extends ListenerAdapter {
     }
 
     public void loadAndPlayNow(GuildMusicManager guildMusicManager, final TextChannel channel, String url, boolean blocking) {
-        Future<Void> future = playerManager.loadItemOrdered(guildMusicManager, url, new AudioLoadResultHandler() {
+        boolean isSearch = !Objects.equals(this.formatUrl(url), url);
+        Future<Void> future = playerManager.loadItemOrdered(guildMusicManager, this.formatUrl(url), new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
                 if (isTooLong(guildMusicManager.getGuild(), track)) {
@@ -58,6 +61,7 @@ public class AudioController extends ListenerAdapter {
                 guildMusicManager.scheduler.queue.clear();
                 guildMusicManager.player.stopTrack();
                 guildMusicManager.scheduler.queue(track);
+                AudioUtils.sendPlayInfoToDJ(channel, track);
                 queue.forEach(guildMusicManager.scheduler::queue);
             }
 
@@ -67,6 +71,10 @@ public class AudioController extends ListenerAdapter {
                 List<AudioTrack> filteredTracks = tracks.stream().filter(track -> !isTooLong(guildMusicManager.getGuild(), track)).collect(Collectors.toList());
                 if (filteredTracks.size() == 0) {
                     channel.sendMessage("All tracks are too long (" + tracks.size() + ")").queue();
+                    return;
+                }
+                if (isSearch) {
+                    this.trackLoaded(filteredTracks.get(0));
                     return;
                 }
                 if (filteredTracks.size() == tracks.size()) {
@@ -108,7 +116,8 @@ public class AudioController extends ListenerAdapter {
     }
 
     public void loadAndPlayNext(GuildMusicManager guildMusicManager, final TextChannel channel, String url, boolean blocking) {
-        Future<Void> future = playerManager.loadItemOrdered(guildMusicManager, url, new AudioLoadResultHandler() {
+        boolean isSearch = !Objects.equals(this.formatUrl(url), url);
+        Future<Void> future = playerManager.loadItemOrdered(guildMusicManager, this.formatUrl(url), new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
                 if (isTooLong(guildMusicManager.getGuild(), track)) {
@@ -128,6 +137,10 @@ public class AudioController extends ListenerAdapter {
                 List<AudioTrack> filteredTracks = tracks.stream().filter(track -> !isTooLong(guildMusicManager.getGuild(), track)).collect(Collectors.toList());
                 if (filteredTracks.size() == 0) {
                     channel.sendMessage("All tracks are too long (" + tracks.size() + ")").queue();
+                    return;
+                }
+                if (isSearch) {
+                    this.trackLoaded(filteredTracks.get(0));
                     return;
                 }
                 if (filteredTracks.size() == tracks.size()) {
@@ -165,7 +178,8 @@ public class AudioController extends ListenerAdapter {
     }
 
     public void loadAndPlay(GuildMusicManager guildMusicManager, final TextChannel channel, String url, boolean blocking) {
-        Future<Void> future = playerManager.loadItemOrdered(guildMusicManager, url, new AudioLoadResultHandler() {
+        boolean isSearch = !Objects.equals(this.formatUrl(url), url);
+        Future<Void> future = playerManager.loadItemOrdered(guildMusicManager, this.formatUrl(url), new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
                 if (isTooLong(guildMusicManager.getGuild(), track)) {
@@ -185,6 +199,10 @@ public class AudioController extends ListenerAdapter {
                 List<AudioTrack> tracks = playlist.getTracks();
                 List<AudioTrack> filteredTracks = tracks.stream().filter(track -> !isTooLong(guildMusicManager.getGuild(), track)).collect(Collectors.toList());
                 int queuePosition = guildMusicManager.scheduler.queue.size() + 1;
+                if (isSearch && !filteredTracks.isEmpty()) {
+                    this.trackLoaded(filteredTracks.get(0));
+                    return;
+                }
                 if (filteredTracks.size() == tracks.size()) {
                     tracks.forEach(guildMusicManager.scheduler::queue);
                     AudioUtils.sendQueuePlaylistInfoToDJ(channel, playlist.getTracks(), playlist, queuePosition, 0);
@@ -214,6 +232,15 @@ public class AudioController extends ListenerAdapter {
                 e.printStackTrace();
             }
         }
+    }
+
+    private String formatUrl(String url) {
+        try {
+            new URL(url);
+        } catch (MalformedURLException ignore) {
+            return "ytsearch: " + url;
+        }
+        return url;
     }
 
     private boolean isTooLong(Guild guild, AudioTrack audioTrack) {

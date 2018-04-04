@@ -95,7 +95,7 @@ public class TrackScheduler extends AudioEventAdapter {
         this.startLeaveRunnable(1000 * 60);
     }
 
-    private void startLeaveRunnable(int milliSeconds) {
+    public void startLeaveRunnable(int milliSeconds) {
         new Thread(() -> {
             if (!this.guild.getAudioManager().isConnected()) {
                 return;
@@ -105,8 +105,15 @@ public class TrackScheduler extends AudioEventAdapter {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            if (player.getPlayingTrack() != null) {
+            if (!this.guild.getAudioManager().isConnected()) {
                 return;
+            }
+            if (this.guild.getAudioManager().getConnectedChannel().getMembers().stream().anyMatch(member -> !member.getUser().isBot())) {
+                return;
+            }
+            if (player.getPlayingTrack() != null) {
+                this.player.stopTrack();
+                this.queue.clear();
             }
             this.guild.getAudioManager().closeAudioConnection();
         }).start();
