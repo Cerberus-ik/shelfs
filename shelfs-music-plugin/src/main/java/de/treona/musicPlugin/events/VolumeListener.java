@@ -7,6 +7,7 @@ import de.treona.musicPlugin.config.ConfigManager;
 import de.treona.musicPlugin.config.GuildSettings;
 import de.treona.musicPlugin.permission.AudioPermissionUtil;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
@@ -32,16 +33,29 @@ public class VolumeListener extends ListenerAdapter {
         if (!message.getAuthor().equals(event.getJDA().getSelfUser())) {
             return;
         }
+        if (message.getEmbeds().size() == 0) {
+            return;
+        }
+        MessageEmbed messageEmbed = message.getEmbeds().get(0);
+        if (messageEmbed.getTitle() != null) {
+            return;
+        }
+        if (messageEmbed.getFields().size() == 0) {
+            return;
+        }
+        if (!messageEmbed.getFields().get(0).getName().contains("volume")) {
+            return;
+        }
         GuildMusicManager guildMusicManager = this.audioController.getMusicManager(event.getGuild());
         boolean saveUpdate = false;
         int newVolume = 25;
         if (event.getReactionEmote().getName().equals("\uD83D\uDD0A")) {
-            guildMusicManager.player.setVolume(Math.min(125, guildMusicManager.player.getVolume() + 10));
+            guildMusicManager.player.setVolume(Math.min(125, guildMusicManager.player.getVolume() + 15));
             newVolume = Math.min(125, guildMusicManager.player.getVolume());
             message.editMessage(AudioUtils.buildVolumeMessage(this.audioController.getMusicManager(event.getGuild()), newVolume, true)).queue();
             saveUpdate = true;
         } else if (event.getReactionEmote().getName().equals("\uD83D\uDD09")) {
-            guildMusicManager.player.setVolume(Math.max(3, guildMusicManager.player.getVolume() - 10));
+            guildMusicManager.player.setVolume(Math.max(3, guildMusicManager.player.getVolume() - 15));
             newVolume = Math.max(3, guildMusicManager.player.getVolume());
             message.editMessage(AudioUtils.buildVolumeMessage(this.audioController.getMusicManager(event.getGuild()), newVolume, true)).queue();
             saveUpdate = true;

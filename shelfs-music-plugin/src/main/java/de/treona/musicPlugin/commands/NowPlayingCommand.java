@@ -23,15 +23,27 @@ public class NowPlayingCommand implements GuildCommand {
         this.audioController = audioController;
     }
 
+    public static void addReactions(Message message, AudioController audioController) {
+        if (audioController.getMusicManager(message.getGuild()).player.isPaused())
+            message.addReaction("▶").complete();
+        else
+            message.addReaction("\u23F8").complete();
+        if (audioController.getMusicManager(message.getGuild()).scheduler.isRepeating())
+            message.addReaction("\uD83D\uDD02").complete();
+        else
+            message.addReaction("\uD83D\uDD01").complete();
+        message.addReaction("⏩").complete();
+    }
+
     @Override
     public void execute(Member member, Message message, TextChannel textChannel) {
         GuildMusicManager guildMusicManager = this.audioController.getMusicManager(member.getGuild());
         AudioPlayer audioPlayer = guildMusicManager.player;
         AudioTrack currentTrack = audioPlayer.getPlayingTrack();
         if (currentTrack == null || !currentTrack.getInfo().isStream) {
-            textChannel.sendMessage(this.generateTrackMessage(currentTrack)).queue();
+            this.sendMessage(textChannel, this.generateTrackMessage(currentTrack));
         } else {
-            textChannel.sendMessage(this.generateStreamMessage(currentTrack)).queue();
+            this.sendMessage(textChannel, this.generateStreamMessage(currentTrack));
         }
     }
 
@@ -113,5 +125,14 @@ public class NowPlayingCommand implements GuildCommand {
     @Override
     public Permission getPermission() {
         return null;
+    }
+
+    private void sendMessage(TextChannel textChannel, MessageEmbed messageEmbed) {
+        new Thread(() -> {
+            Message message = textChannel.sendMessage(messageEmbed).complete();
+            if (messageEmbed.getTitle() != null) {
+                addReactions(message, audioController);
+            }
+        }).start();
     }
 }

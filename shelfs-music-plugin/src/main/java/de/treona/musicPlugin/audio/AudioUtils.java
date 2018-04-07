@@ -140,9 +140,6 @@ public class AudioUtils {
         AudioPlayer audioPlayer = guildMusicManager.player;
         audioPlayer.setVolume(newVolume);
         EmbedBuilder embedBuilder = new EmbedBuilder();
-        if (setValue) {
-            embedBuilder.setTitle("New player volume");
-        }
         embedBuilder.setColor(Color.yellow);
         embedBuilder.addField(buildVolumeMessageField(3, 125, newVolume));
         return embedBuilder.build();

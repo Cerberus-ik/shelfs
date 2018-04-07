@@ -6,6 +6,7 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import de.treona.musicPlugin.audio.AudioController;
 import de.treona.musicPlugin.commands.*;
 import de.treona.musicPlugin.config.ConfigManager;
+import de.treona.musicPlugin.events.NowPlayingListener;
 import de.treona.musicPlugin.events.PlayerLeaveListener;
 import de.treona.musicPlugin.events.QueueListener;
 import de.treona.musicPlugin.events.VolumeListener;
@@ -30,6 +31,7 @@ public class Main extends ShelfsPlugin {
         Shelfs.getJda().addEventListener(new VolumeListener(audioController, configManager));
         Shelfs.getJda().addEventListener(new QueueListener(audioController));
         Shelfs.getJda().addEventListener(new PlayerLeaveListener(audioController));
+        Shelfs.getJda().addEventListener(new NowPlayingListener(audioController));
 
         Shelfs.getCommandManager().registerCommand(this, "musicRole", new MusicRoleCommand(configManager));
         Shelfs.getCommandManager().registerCommand(this, "play", new PlayCommand(audioController));
