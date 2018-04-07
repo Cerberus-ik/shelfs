@@ -50,7 +50,7 @@ public class CommandsCommand implements GuildCommand, PrivateCommand {
                     .collect(Collectors.toList());
             if (plugins.size() == 0) {
                 channel.sendMessage("There is no plugin with that name.").queue();
-                return null;
+                return command -> false;
             }
             predicate = command -> Shelfs.getCommandManager()
                     .getPluginFromCommand(command)
@@ -60,7 +60,7 @@ public class CommandsCommand implements GuildCommand, PrivateCommand {
     }
 
     private Object buildMessage(Predicate<? super Command> predicate) {
-        if (Shelfs.getCommandManager().getCommands().size() > 20) {
+        if (Shelfs.getCommandManager().getCommands().stream().filter(predicate).count() > 20) {
             return this.buildSimpleMessage(predicate);
         } else {
             return this.buildEmbedMessage(predicate);
@@ -70,7 +70,7 @@ public class CommandsCommand implements GuildCommand, PrivateCommand {
     private String buildSimpleMessage(Predicate<? super Command> predicate) {
         StringBuilder stringBuilder = new StringBuilder();
         List<Command> commands = Shelfs.getCommandManager().getCommands().stream().filter(predicate).collect(Collectors.toList());
-        stringBuilder.append("Available commands: ")
+        stringBuilder.append("Commands: ")
                 .append(commands.size())
                 .append(" (")
                 .append(Shelfs.getCommandManager().getCommands().size())
@@ -80,17 +80,23 @@ public class CommandsCommand implements GuildCommand, PrivateCommand {
             stringBuilder.append(command.getName())
                     .append(" from: ")
                     .append(Shelfs.getCommandManager().getPluginFromCommand(command).getPluginDescription().getName())
+                    .append(System.lineSeparator())
                     .append(command.getDescription())
                     .append(System.lineSeparator())
-                    .append(this.getPermissionString(command.getPermission()));
+                    .append(this.getPermissionString(command.getPermission()))
+                    .append(System.lineSeparator());
         });
+        String buildMessage = stringBuilder.toString();
+        if (buildMessage.length() > 1999) {
+            return buildMessage.substring(0, 1996) + "...";
+        }
         return stringBuilder.toString();
     }
 
     private MessageEmbed buildEmbedMessage(Predicate<? super Command> predicate) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         List<Command> commands = Shelfs.getCommandManager().getCommands().stream().filter(predicate).collect(Collectors.toList());
-        embedBuilder.setTitle("Available commands: " + commands.size() + " (" + Shelfs.getCommandManager().getCommands().size() + ")");
+        embedBuilder.setTitle("Commands: " + commands.size() + " (" + Shelfs.getCommandManager().getCommands().size() + ")");
         embedBuilder.setColor(Color.ORANGE);
         Shelfs.getCommandManager().getCommands().stream().filter(predicate).forEach(
                 command -> embedBuilder.addField(command.getName()
