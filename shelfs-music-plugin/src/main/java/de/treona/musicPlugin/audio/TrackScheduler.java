@@ -18,8 +18,8 @@ import static java.lang.Thread.sleep;
 
 public class TrackScheduler extends AudioEventAdapter {
 
-    public final Queue<AudioTrack> queue;
     private final AudioPlayer player;
+    public Queue<AudioTrack> queue;
     public AudioTrack lastTrack;
     private boolean repeating = false;
     private GuildMusicManager guildMusicManager;
@@ -58,10 +58,11 @@ public class TrackScheduler extends AudioEventAdapter {
         AudioTrack audioTrack = this.queue.poll();
         if (audioTrack == null && this.autoPlaylist != null) {
             AudioUtils.sendAutoPlaylistInformation(this.textChannel, "<" + this.autoPlaylist + ">");
-            this.audioController.loadAndPlay(this.guildMusicManager,
+            this.audioController.load(this.guildMusicManager,
                     this.textChannel,
                     this.autoPlaylist,
-                    true);
+                    true,
+                    QueueAction.QUEUE);
             this.shuffle();
             audioTrack = this.queue.poll();
         }
@@ -129,5 +130,10 @@ public class TrackScheduler extends AudioEventAdapter {
 
     public void shuffle() {
         Collections.shuffle((List<?>) this.queue);
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public int getPositionOfTrack(AudioTrack track) {
+        return new LinkedList<>(this.queue).lastIndexOf(track);
     }
 }

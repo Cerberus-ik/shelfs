@@ -28,6 +28,7 @@ public class StopCommand implements GuildCommand {
         guildMusicManager.player.stopTrack();
         guildMusicManager.player.setPaused(false);
         textChannel.sendMessage("Stopped all playbacks.").queue();
+        guildMusicManager.scheduler.startLeaveRunnable(60 * 1000);
     }
 
     @Override

@@ -19,7 +19,7 @@ public class Main extends ShelfsPlugin {
 
     @Override
     public void onEnable() {
-        Shelfs.getJda().getPresence().setGame(Game.of(Game.GameType.LISTENING, Shelfs.getCommandManager().getCommandPrefix() + "play url"));
+        Shelfs.getJda().getPresence().setGame(Game.of(Game.GameType.LISTENING, Shelfs.getCommandManager().getCommandPrefix() + "play song"));
         ConfigManager configManager = new ConfigManager(this);
         configManager.loadConfig();
         new AudioPermissionUtil(configManager);
@@ -27,7 +27,6 @@ public class Main extends ShelfsPlugin {
         AudioSourceManagers.registerRemoteSources(audioPlayerManager);
         AudioController audioController = new AudioController(configManager);
 
-        Shelfs.getJda().addEventListener(audioController);
         Shelfs.getJda().addEventListener(new VolumeListener(audioController, configManager));
         Shelfs.getJda().addEventListener(new QueueListener(audioController));
         Shelfs.getJda().addEventListener(new PlayerLeaveListener(audioController));

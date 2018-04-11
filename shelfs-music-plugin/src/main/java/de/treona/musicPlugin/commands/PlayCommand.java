@@ -3,6 +3,7 @@ package de.treona.musicPlugin.commands;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import de.treona.musicPlugin.audio.AudioController;
 import de.treona.musicPlugin.audio.AudioUtils;
+import de.treona.musicPlugin.audio.QueueAction;
 import de.treona.musicPlugin.audio.TrackScheduler;
 import de.treona.musicPlugin.permission.AudioPermissionUtil;
 import de.treona.shelfs.commands.GuildCommand;
@@ -44,14 +45,14 @@ public class PlayCommand implements GuildCommand {
             }
 
             if (args.length > 2 && args[1].equalsIgnoreCase("now")) {
-                this.audioController.loadAndPlayNow(this.audioController.getMusicManager(member.getGuild()),
-                        textChannel, buildIdentifier(args), false);
+                this.audioController.load(this.audioController.getMusicManager(member.getGuild()),
+                        textChannel, buildIdentifier(args), false, QueueAction.PLAY_NOW);
             } else if (args.length > 2 && args[1].equalsIgnoreCase("next")) {
-                this.audioController.loadAndPlayNext(this.audioController.getMusicManager(member.getGuild()),
-                        textChannel, buildIdentifier(args), false);
+                this.audioController.load(this.audioController.getMusicManager(member.getGuild()),
+                        textChannel, buildIdentifier(args), false, QueueAction.PLAY_NEXT);
             } else {
-                this.audioController.loadAndPlay(this.audioController.getMusicManager(member.getGuild()),
-                        textChannel, buildIdentifier(args), false);
+                this.audioController.load(this.audioController.getMusicManager(member.getGuild()),
+                        textChannel, buildIdentifier(args), false, QueueAction.QUEUE);
             }
         }
     }

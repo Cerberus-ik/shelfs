@@ -43,7 +43,7 @@ public class SkipCommand implements GuildCommand {
                 return;
             }
             GuildMusicManager musicManager = this.audioController.getMusicManager(member.getGuild());
-            songsToSkip = Math.min(songsToSkip, musicManager.scheduler.queue.size());
+            songsToSkip = Math.min(songsToSkip, musicManager.scheduler.queue.size() + 1);
             for (int i = 0; i < songsToSkip - 1; i++)
                 musicManager.scheduler.queue.poll();
             textChannel.sendMessage("Skipping " + songsToSkip + " songs.").queue();
@@ -60,9 +60,9 @@ public class SkipCommand implements GuildCommand {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setColor(Color.ORANGE);
         if (track != null) {
-            embedBuilder.addField("", "Skipped: " + track.getInfo().title, false);
+            embedBuilder.addField("Skipped:", "" + track.getInfo().title, false);
         } else {
-            embedBuilder.addField("", "Next track... ", false);
+            embedBuilder.addField("Next track...", "", false);
         }
         textChannel.sendMessage(embedBuilder.build()).queue();
         musicManager.scheduler.nextTrack();
