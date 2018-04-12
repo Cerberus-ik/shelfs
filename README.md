@@ -31,14 +31,20 @@ class Main : ShelfsPlugin() {
 }
 ```
 
+### Plugin installation
+Just drag an drop any plugin jars you like in the plugins folder.
+Always be careful with plugins from unknown sources. They have the potential to
+steal your discord bot token. <br>
+**Plugins can steal your token!** <br>
+**Plugins have the exact same permission as the bot itself!**
 
 
 ### Road map
 - Add an authentication check to the database
 - Custom plugin var support
-- Custom permissions
 
 ### Dependencies
+- kotlin runtime
 - everit-org.json-schema
 - net.dv8tion:JDA
 - google-gson
