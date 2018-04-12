@@ -10,11 +10,11 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 
-public class RestartCommand implements GuildCommand {
+public class ReplayCommand implements GuildCommand {
 
     private AudioController audioController;
 
-    public RestartCommand(AudioController audioController) {
+    public ReplayCommand(AudioController audioController) {
         this.audioController = audioController;
     }
 
@@ -26,8 +26,8 @@ public class RestartCommand implements GuildCommand {
         }
         GuildMusicManager guildMusicManager = this.audioController.getMusicManager(member.getGuild());
         if (guildMusicManager.player.getPlayingTrack() != null) {
-            guildMusicManager.player.playTrack(guildMusicManager.player.getPlayingTrack());
-            AudioUtils.sendPlayInfoToDJ(textChannel, guildMusicManager.scheduler.lastTrack);
+            guildMusicManager.player.playTrack(guildMusicManager.player.getPlayingTrack().makeClone());
+            AudioUtils.sendPlayInfoToDJ(textChannel, guildMusicManager.scheduler.lastTrack.makeClone());
         } else if (guildMusicManager.scheduler.lastTrack == null) {
             textChannel.sendMessage("No track got played so far.").queue();
         } else {
@@ -38,7 +38,7 @@ public class RestartCommand implements GuildCommand {
 
     @Override
     public String getName() {
-        return "Restart";
+        return "Replay";
     }
 
     @Override

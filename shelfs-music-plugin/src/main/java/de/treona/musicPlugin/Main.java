@@ -43,7 +43,7 @@ public class Main extends ShelfsPlugin {
         Shelfs.getCommandManager().registerCommand(this, "stop", new StopCommand(audioController));
         Shelfs.getCommandManager().registerCommand(this, "queue", new QueueCommand(audioController));
         Shelfs.getCommandManager().registerCommand(this, "repeat", new RepeatCommand(audioController));
-        Shelfs.getCommandManager().registerCommand(this, "restart", new RestartCommand(audioController));
+        Shelfs.getCommandManager().registerCommand(this, "replay", new ReplayCommand(audioController));
         Shelfs.getCommandManager().registerCommand(this, "shuffle", new ShuffleCommand(audioController));
         Shelfs.getCommandManager().registerCommand(this, "settings", new SettingsCommand(configManager, audioController));
     }

@@ -62,7 +62,7 @@ public class TrackScheduler extends AudioEventAdapter {
                     this.textChannel,
                     this.autoPlaylist,
                     true,
-                    QueueAction.QUEUE);
+                    QueueAction.QUEUE_AND_DO_NOT_PLAY);
             this.shuffle();
             audioTrack = this.queue.poll();
         }
@@ -74,7 +74,7 @@ public class TrackScheduler extends AudioEventAdapter {
             return;
         }
         this.player.startTrack(audioTrack, false);
-        AudioUtils.sendPlayInfoToDJ(textChannel, audioTrack);
+        AudioUtils.sendPlayInfoToDJ(this.textChannel, audioTrack);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class TrackScheduler extends AudioEventAdapter {
         // Only start the next track if the end reason is suitable for it (FINISHED or LOAD_FAILED)
         if (endReason.mayStartNext) {
             if (this.repeating)
-                player.startTrack(lastTrack.makeClone(), false);
+                player.startTrack(lastTrack.makeClone(), true);
             else
                 this.nextTrack();
         } else {

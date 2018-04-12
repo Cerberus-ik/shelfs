@@ -29,6 +29,12 @@ public class PlayCommand implements GuildCommand {
         String[] args = message.getContentRaw().split(" ");
         AudioPlayer player = this.audioController.getMusicManager(member.getGuild()).player;
         TrackScheduler trackScheduler = this.audioController.getMusicManager(member.getGuild()).scheduler;
+
+        if (!AudioUtils.joinMember(member) && !member.getGuild().getAudioManager().isConnected()) {
+            textChannel.sendMessage("I have no place to play my music :(").queue();
+            return;
+        }
+
         if (args.length <= 1) {
             if (player.isPaused()) {
                 player.setPaused(false);
@@ -36,14 +42,8 @@ public class PlayCommand implements GuildCommand {
             }
             if (player.getPlayingTrack() == null) {
                 trackScheduler.nextTrack();
-                AudioUtils.joinMember(member);
             }
         } else {
-            if (!AudioUtils.joinMember(member) && !member.getGuild().getAudioManager().isConnected()) {
-                textChannel.sendMessage("I have no place to play my music :(").queue();
-                return;
-            }
-
             if (args.length > 2 && args[1].equalsIgnoreCase("now")) {
                 this.audioController.load(this.audioController.getMusicManager(member.getGuild()),
                         textChannel, buildIdentifier(args), false, QueueAction.PLAY_NOW);
@@ -52,7 +52,7 @@ public class PlayCommand implements GuildCommand {
                         textChannel, buildIdentifier(args), false, QueueAction.PLAY_NEXT);
             } else {
                 this.audioController.load(this.audioController.getMusicManager(member.getGuild()),
-                        textChannel, buildIdentifier(args), false, QueueAction.QUEUE);
+                        textChannel, buildIdentifier(args), false, QueueAction.QUEUE_AND_PLAY);
             }
         }
     }
