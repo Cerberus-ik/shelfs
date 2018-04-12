@@ -80,7 +80,7 @@ public final class Shelfs {
     }
 
     public static String getVersion() {
-        return "0.2.3";
+        return "0.3.1";
     }
 
     public static JDA getJda() {
@@ -89,7 +89,7 @@ public final class Shelfs {
 
     private static void setJda(JDA jda) {
         if (Shelfs.jda != null) {
-            throw new UnsupportedOperationException("The test object is already set.");
+            throw new UnsupportedOperationException("The jda object is already set.");
         }
         Shelfs.jda = jda;
     }
@@ -105,7 +105,7 @@ public final class Shelfs {
     public static JSONObject getConfig(ShelfsPlugin plugin) {
         File configFile = new File(getConfigDirectory(plugin) + "/config.json");
         if (!configFile.exists()) {
-            return null;
+            return plugin.getDefaultConfig();
         }
         try {
             try (BufferedReader bufferedReader = new BufferedReader(new FileReader(configFile))) {

@@ -2,7 +2,6 @@ package de.treona.shelfs.commands;
 
 import de.treona.shelfs.api.plugin.ShelfsPlugin;
 import de.treona.shelfs.permission.Permission;
-import de.treona.shelfs.permission.PermissionUtil;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.PrivateChannel;
@@ -100,7 +99,7 @@ public class CommandManager {
                 .findAny()
                 .orElse(null);
         Command command = this.commands.get(commandData);
-        if (!PermissionUtil.hasPermission(message.getAuthor(), command.getPermission())) {
+        if (command.getPermission() != null && !command.getPermission().hasPermission(message.getMember())) {
             channel.sendMessage("Sorry but you don't have enough permission to execute this command.").queue();
             return;
         }
