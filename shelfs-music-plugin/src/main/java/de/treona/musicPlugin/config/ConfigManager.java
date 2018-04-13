@@ -29,8 +29,8 @@ public class ConfigManager {
     public GuildSettings getGuildSettings(Guild guild) {
         if (!this.config.getJSONObject("guildSettings").has(guild.getId())) {
             this.config.getJSONObject("guildSettings").put(guild.getId(), GuildSettings.newGuildSettings().toJSON());
+            this.saveConfig();
         }
-        this.saveConfig();
         return GuildSettings.fromJSON(this.config.getJSONObject("guildSettings").getJSONObject(guild.getId()));
     }
 
@@ -39,7 +39,7 @@ public class ConfigManager {
         this.saveConfig();
     }
 
-    public void saveConfig() {
+    private void saveConfig() {
         this.shelfsPlugin.saveConfig(this.config);
     }
 }

@@ -8,14 +8,16 @@ import org.json.JSONObject;
 
 public class GuildSettings {
 
-    private Role botRole;
-    private int volume;
-    private String autoPlaylist;
-    private int maxSongLength;
-    private TextChannel musicChannel;
+    public Role djRole;
+    public Role settingsRole;
+    public int volume;
+    public String autoPlaylist;
+    public int maxSongLength;
+    public TextChannel musicChannel;
 
-    private GuildSettings(Role botRole, int volume, String autoPlaylist, int maxSongLength, TextChannel channel) {
-        this.botRole = botRole;
+    private GuildSettings(Role djRole, Role settingsRole, int volume, String autoPlaylist, int maxSongLength, TextChannel channel) {
+        this.djRole = djRole;
+        this.settingsRole = settingsRole;
         this.volume = volume;
         this.autoPlaylist = autoPlaylist;
         this.maxSongLength = maxSongLength;
@@ -23,19 +25,26 @@ public class GuildSettings {
     }
 
     static GuildSettings fromJSON(JSONObject guildSettingsObject) {
-        Role role;
+        Role djRole;
+        Role settingsRole;
         try {
-            role = Shelfs.getJda().getRoleById(guildSettingsObject.getString("botRole"));
-        } catch (IllegalArgumentException e) {
-            role = null;
+            djRole = Shelfs.getJda().getRoleById(guildSettingsObject.getString("botRole"));
+        } catch (IllegalArgumentException | NullPointerException | JSONException e) {
+            djRole = null;
         }
+        try {
+            settingsRole = Shelfs.getJda().getRoleById(guildSettingsObject.getString("settingsRole"));
+        } catch (IllegalArgumentException | NullPointerException | JSONException e) {
+            settingsRole = null;
+        }
+
         TextChannel textChannel;
         try {
             textChannel = Shelfs.getJda().getTextChannelById(guildSettingsObject.getString("musicChannel"));
         } catch (IllegalArgumentException | JSONException e) {
             textChannel = null;
         }
-        return new GuildSettings(role,
+        return new GuildSettings(djRole, settingsRole,
                 guildSettingsObject.getInt("volume"),
                 guildSettingsObject.getString("autoPlaylist"),
                 guildSettingsObject.getInt("maxSongLength"),
@@ -43,65 +52,27 @@ public class GuildSettings {
     }
 
     static GuildSettings newGuildSettings() {
-        return new GuildSettings(null, 35, null, 900, null);
+        return new GuildSettings(null, null, 35, null, 900, null);
     }
 
-    public Role getBotRole() {
-        return botRole;
-    }
-
-    public void setBotRole(Role botRole) {
-        this.botRole = botRole;
-    }
-
-    public int getVolume() {
-        return volume;
-    }
-
-    public void setVolume(int volume) {
-        this.volume = volume;
-    }
-
-    public String getAutoPlaylist() {
-        return autoPlaylist;
-    }
-
-    public void setAutoPlaylist(String autoPlaylist) {
-        this.autoPlaylist = autoPlaylist;
-    }
-
-    public TextChannel getMusicChannel() {
-        return musicChannel;
-    }
-
-    public void setMusicChannel(TextChannel musicChannel) {
-        this.musicChannel = musicChannel;
-    }
-
-    public int getMaxSongLength() {
-        return maxSongLength;
-    }
-
-    public void setMaxSongLength(int maxSongLength) {
-        this.maxSongLength = maxSongLength;
-    }
-
-    public JSONObject toJSON() {
+    JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
-        if (this.botRole == null) {
+        if (this.djRole == null)
             jsonObject.put("botRole", "");
-        } else {
-            jsonObject.put("botRole", this.botRole.getId());
-        }
-        if (this.musicChannel == null) {
+        else
+            jsonObject.put("botRole", this.djRole.getId());
+        if (this.settingsRole == null)
+            jsonObject.put("settingsRole", "");
+        else
+            jsonObject.put("settingsRole", this.settingsRole.getId());
+        if (this.musicChannel == null)
             jsonObject.put("musicChannel", "");
-        } else {
+        else
             jsonObject.put("musicChannel", this.musicChannel.getId());
-        }
+
         jsonObject.put("autoPlaylist", this.requireNotNullOrElse(this.autoPlaylist, ""));
         jsonObject.put("volume", this.volume);
         jsonObject.put("maxSongLength", this.maxSongLength);
-
         return jsonObject;
     }
 

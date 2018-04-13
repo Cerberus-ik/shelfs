@@ -2,7 +2,7 @@ package de.treona.musicPlugin.commands;
 
 import de.treona.musicPlugin.audio.AudioController;
 import de.treona.musicPlugin.audio.GuildMusicManager;
-import de.treona.musicPlugin.permission.AudioPermissionUtil;
+import de.treona.musicPlugin.permission.DJPermission;
 import de.treona.shelfs.commands.GuildCommand;
 import de.treona.shelfs.permission.Permission;
 import net.dv8tion.jda.core.entities.Member;
@@ -19,10 +19,6 @@ public class StopCommand implements GuildCommand {
 
     @Override
     public void execute(Member member, Message message, TextChannel textChannel) {
-        if (!AudioPermissionUtil.hasAudioPermission(member)) {
-            textChannel.sendMessage("Sorry but you don't have the permission to use this command.").queue();
-            return;
-        }
         GuildMusicManager guildMusicManager = this.audioController.getMusicManager(member.getGuild());
         guildMusicManager.scheduler.queue.clear();
         guildMusicManager.player.stopTrack();
@@ -43,6 +39,6 @@ public class StopCommand implements GuildCommand {
 
     @Override
     public Permission getPermission() {
-        return null;
+        return new DJPermission();
     }
 }

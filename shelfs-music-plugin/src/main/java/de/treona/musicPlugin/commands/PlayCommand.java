@@ -5,7 +5,7 @@ import de.treona.musicPlugin.audio.AudioController;
 import de.treona.musicPlugin.audio.AudioUtils;
 import de.treona.musicPlugin.audio.QueueAction;
 import de.treona.musicPlugin.audio.TrackScheduler;
-import de.treona.musicPlugin.permission.AudioPermissionUtil;
+import de.treona.musicPlugin.permission.DJPermission;
 import de.treona.shelfs.commands.GuildCommand;
 import de.treona.shelfs.permission.Permission;
 import net.dv8tion.jda.core.entities.Member;
@@ -22,10 +22,6 @@ public class PlayCommand implements GuildCommand {
 
     @Override
     public void execute(Member member, Message message, TextChannel textChannel) {
-        if (!AudioPermissionUtil.hasAudioPermission(member)) {
-            textChannel.sendMessage("Sorry but you don't have the permission to use this command.").queue();
-            return;
-        }
         String[] args = message.getContentRaw().split(" ");
         AudioPlayer player = this.audioController.getMusicManager(member.getGuild()).player;
         TrackScheduler trackScheduler = this.audioController.getMusicManager(member.getGuild()).scheduler;
@@ -89,6 +85,6 @@ public class PlayCommand implements GuildCommand {
 
     @Override
     public Permission getPermission() {
-        return null;
+        return new DJPermission();
     }
 }

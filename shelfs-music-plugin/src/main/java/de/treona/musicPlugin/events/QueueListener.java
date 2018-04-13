@@ -1,9 +1,9 @@
 package de.treona.musicPlugin.events;
 
 import de.treona.musicPlugin.audio.AudioController;
-import de.treona.musicPlugin.audio.AudioUtils;
 import de.treona.musicPlugin.audio.GuildMusicManager;
 import de.treona.musicPlugin.permission.AudioPermissionUtil;
+import de.treona.musicPlugin.util.AudioMessageUtils;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
@@ -49,11 +49,11 @@ public class QueueListener extends ListenerAdapter {
         }
         if (event.getReactionEmote().getName().equals("◀")) {
             if (currentSite != 1) {
-                message.editMessage(AudioUtils.buildQueueMessage(new ArrayList<>(guildMusicManager.scheduler.queue), currentSite - 1, event.getChannel())).queue();
+                message.editMessage(AudioMessageUtils.buildQueueMessage(new ArrayList<>(guildMusicManager.scheduler.queue), currentSite - 1, event.getChannel())).queue();
             }
         } else if (event.getReactionEmote().getName().equals("▶")) {
             if (currentSite != sites) {
-                message.editMessage(AudioUtils.buildQueueMessage(new ArrayList<>(guildMusicManager.scheduler.queue), currentSite + 1, event.getChannel())).queue();
+                message.editMessage(AudioMessageUtils.buildQueueMessage(new ArrayList<>(guildMusicManager.scheduler.queue), currentSite + 1, event.getChannel())).queue();
             }
         }
         event.getReaction().removeReaction(event.getUser()).queue();

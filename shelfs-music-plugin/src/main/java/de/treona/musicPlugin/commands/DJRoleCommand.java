@@ -2,6 +2,7 @@ package de.treona.musicPlugin.commands;
 
 import de.treona.musicPlugin.config.ConfigManager;
 import de.treona.musicPlugin.config.GuildSettings;
+import de.treona.musicPlugin.permission.SettingsPermission;
 import de.treona.shelfs.commands.GuildCommand;
 import de.treona.shelfs.permission.Permission;
 import net.dv8tion.jda.core.JDA;
@@ -12,20 +13,16 @@ import net.dv8tion.jda.core.entities.TextChannel;
 
 import java.util.List;
 
-public class MusicRoleCommand implements GuildCommand {
+public class DJRoleCommand implements GuildCommand {
 
     private ConfigManager configManager;
 
-    public MusicRoleCommand(ConfigManager configManager) {
+    public DJRoleCommand(ConfigManager configManager) {
         this.configManager = configManager;
     }
 
     @Override
     public void execute(Member member, Message message, TextChannel textChannel) {
-        if (!member.isOwner()) {
-            textChannel.sendMessage("Only the owner can change this.").queue();
-            return;
-        }
         List<Role> roles = message.getMentionedRoles();
         if (roles.size() > 1) {
             textChannel.sendMessage("Please only specify one role!").queue();
@@ -35,7 +32,7 @@ public class MusicRoleCommand implements GuildCommand {
         if (roles.size() == 0) {
             Role tempRole = this.getRole(message.getContentRaw(), member.getJDA());
             if (tempRole == null) {
-                textChannel.sendMessage("Please mention the role with ``@RoleName`` or simply past the role id.").queue();
+                textChannel.sendMessage("Please mention the role with ``@RoleName`` or simply past the role id. (Make sure the role is mentionable)").queue();
                 return;
             }
             role = tempRole;
@@ -47,7 +44,7 @@ public class MusicRoleCommand implements GuildCommand {
             return;
         }
         GuildSettings guildSettings = this.configManager.getGuildSettings(member.getGuild());
-        guildSettings.setBotRole(role);
+        guildSettings.djRole = role;
         this.configManager.saveGuildSettings(member.getGuild(), guildSettings);
         textChannel.sendMessage("Settings got saved successfully.").queue();
     }
@@ -66,7 +63,7 @@ public class MusicRoleCommand implements GuildCommand {
 
     @Override
     public String getName() {
-        return "Music Role";
+        return "DJ Role";
     }
 
     @Override
@@ -76,6 +73,6 @@ public class MusicRoleCommand implements GuildCommand {
 
     @Override
     public Permission getPermission() {
-        return null;
+        return new SettingsPermission();
     }
 }

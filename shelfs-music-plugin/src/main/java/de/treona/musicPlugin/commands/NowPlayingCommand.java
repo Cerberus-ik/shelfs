@@ -3,8 +3,8 @@ package de.treona.musicPlugin.commands;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import de.treona.musicPlugin.audio.AudioController;
-import de.treona.musicPlugin.audio.AudioUtils;
 import de.treona.musicPlugin.audio.GuildMusicManager;
+import de.treona.musicPlugin.util.AudioMessageUtils;
 import de.treona.shelfs.commands.GuildCommand;
 import de.treona.shelfs.permission.Permission;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -84,7 +84,7 @@ public class NowPlayingCommand implements GuildCommand {
         }
         stringBuilder.append("⭕");
         stringBuilder.append(String.format("``[%s-%s]``",
-                AudioUtils.formatDuration(audioTrack.getPosition()),
+                AudioMessageUtils.formatDuration(audioTrack.getPosition()),
                 "∞"));
         return new MessageEmbed.Field(audioTrack.getInfo().title, stringBuilder.toString(), false);
     }
@@ -107,8 +107,8 @@ public class NowPlayingCommand implements GuildCommand {
         }
         stringBuilder.append("**");
         stringBuilder.append(String.format("``[%s-%s]``",
-                AudioUtils.formatDuration(audioTrack.getPosition()),
-                AudioUtils.formatDuration(audioTrack.getDuration())));
+                AudioMessageUtils.formatDuration(audioTrack.getPosition()),
+                AudioMessageUtils.formatDuration(audioTrack.getDuration())));
         return new MessageEmbed.Field(audioTrack.getInfo().title, stringBuilder.toString(), false);
     }
 

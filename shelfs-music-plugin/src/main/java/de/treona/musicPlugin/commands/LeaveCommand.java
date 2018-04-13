@@ -1,6 +1,6 @@
 package de.treona.musicPlugin.commands;
 
-import de.treona.musicPlugin.permission.AudioPermissionUtil;
+import de.treona.musicPlugin.permission.DJPermission;
 import de.treona.shelfs.commands.GuildCommand;
 import de.treona.shelfs.permission.Permission;
 import net.dv8tion.jda.core.entities.Member;
@@ -11,10 +11,6 @@ public class LeaveCommand implements GuildCommand {
 
     @Override
     public void execute(Member member, Message message, TextChannel textChannel) {
-        if (!AudioPermissionUtil.hasAudioPermission(member)) {
-            textChannel.sendMessage("Sorry bot you don't have permission to control this bot.").queue();
-            return;
-        }
         if (!member.getGuild().getAudioManager().isConnected()) {
             return;
         }
@@ -33,6 +29,6 @@ public class LeaveCommand implements GuildCommand {
 
     @Override
     public Permission getPermission() {
-        return null;
+        return new DJPermission();
     }
 }

@@ -4,6 +4,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import de.treona.musicPlugin.util.AudioMessageUtils;
 import de.treona.shelfs.api.Shelfs;
 import de.treona.shelfs.io.logger.LogLevel;
 import net.dv8tion.jda.core.entities.Guild;
@@ -56,8 +57,8 @@ public class TrackScheduler extends AudioEventAdapter {
      */
     public void nextTrack() {
         AudioTrack audioTrack = this.queue.poll();
-        if (audioTrack == null && this.autoPlaylist != null) {
-            AudioUtils.sendAutoPlaylistInformation(this.textChannel, "<" + this.autoPlaylist + ">");
+        if (audioTrack == null && this.autoPlaylist != null && this.autoPlaylist.length() > 2) {
+            AudioMessageUtils.sendAutoPlaylistInformation(this.textChannel, "<" + this.autoPlaylist + ">");
             this.audioController.load(this.guildMusicManager,
                     this.textChannel,
                     this.autoPlaylist,
@@ -74,7 +75,7 @@ public class TrackScheduler extends AudioEventAdapter {
             return;
         }
         this.player.startTrack(audioTrack, false);
-        AudioUtils.sendPlayInfoToDJ(this.textChannel, audioTrack);
+        AudioMessageUtils.sendPlayInfoToDJ(this.textChannel, audioTrack);
     }
 
     @Override

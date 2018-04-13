@@ -14,6 +14,9 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import de.treona.musicPlugin.config.ConfigManager;
+import de.treona.musicPlugin.config.GuildSettings;
+import de.treona.musicPlugin.util.AudioMessageUtils;
+import de.treona.musicPlugin.util.SearchManager;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 
@@ -30,11 +33,14 @@ public class AudioController {
 
     private final AudioPlayerManager playerManager;
     private final Map<String, GuildMusicManager> musicManagers;
+    private final SearchManager searchManager;
     private ConfigManager configManager;
+    @SuppressWarnings("FieldCanBeLocal")
     private final int TIMEOUT = 25000;
 
     public AudioController(ConfigManager configManager) {
         this.playerManager = new DefaultAudioPlayerManager();
+        this.searchManager = new SearchManager();
         playerManager.registerSourceManager(new YoutubeAudioSourceManager());
         playerManager.registerSourceManager(new SoundCloudAudioSourceManager());
         playerManager.registerSourceManager(new BandcampAudioSourceManager());
@@ -42,14 +48,13 @@ public class AudioController {
         playerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
         playerManager.registerSourceManager(new HttpAudioSourceManager());
         playerManager.registerSourceManager(new LocalAudioSourceManager());
-
         musicManagers = new HashMap<>();
         this.configManager = configManager;
     }
 
-    public void load(GuildMusicManager guildMusicManager, final TextChannel channel, String url, boolean blocking, QueueAction action) {
-        boolean isSearch = !Objects.equals(this.formatUrl(url), url);
-        Future<Void> future = playerManager.loadItemOrdered(guildMusicManager, this.formatUrl(url), new AudioLoadResultHandler() {
+    public void load(GuildMusicManager guildMusicManager, final TextChannel channel, String identifier, boolean blocking, QueueAction action) {
+        boolean isSearch = !Objects.equals(this.formatUrl(identifier), identifier);
+        Future<Void> future = playerManager.loadItemOrdered(guildMusicManager, this.formatUrl(identifier), new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
                 List<AudioTrack> trackList = new ArrayList<>();
@@ -79,15 +84,14 @@ public class AudioController {
                     return;
                 }
                 if (isSearch) {
-                    //TODO add fancy search
-                    AudioTrack track = filteredTracks.get(0);
-                    filteredTracks.clear();
-                    filteredTracks.add(track);
+                    searchManager.addSearch(channel.getGuild(), tracks);
+                    AudioMessageUtils.sendSearchResults(channel, tracks, identifier);
+                    return;
                 }
                 Queue<AudioTrack> queue = guildMusicManager.scheduler.queue;
                 queue = this.addTracks(queue, filteredTracks, action);
                 guildMusicManager.scheduler.queue = queue;
-                AudioUtils.sendQueueInfo(channel, filteredTracks, guildMusicManager);
+                AudioMessageUtils.sendQueueInfo(channel, filteredTracks, guildMusicManager);
                 if (action.equals(QueueAction.PLAY_NOW) && guildMusicManager.scheduler.queue.size() > 0) {
                     guildMusicManager.scheduler.nextTrack();
                 }
@@ -130,7 +134,11 @@ public class AudioController {
         if (audioTrack.getInfo().isStream) {
             return false;
         }
-        return this.configManager.getGuildSettings(guild).getMaxSongLength() < TimeUnit.MILLISECONDS.toSeconds(audioTrack.getDuration());
+        GuildSettings guildSettings = this.configManager.getGuildSettings(guild);
+        if (guildSettings.maxSongLength == 0) {
+            return false;
+        }
+        return guildSettings.maxSongLength < TimeUnit.MILLISECONDS.toSeconds(audioTrack.getDuration());
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {
@@ -151,7 +159,11 @@ public class AudioController {
     }
 
     private int getVolume(Guild guild) {
-        return this.configManager.getGuildSettings(guild).getVolume();
+        return this.configManager.getGuildSettings(guild).volume;
+    }
+
+    public SearchManager getSearchManager() {
+        return searchManager;
     }
 
     public TemporaryPlayer generateTemporaryPlayer() {

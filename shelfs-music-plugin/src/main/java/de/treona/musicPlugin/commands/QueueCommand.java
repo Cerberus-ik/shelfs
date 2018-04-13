@@ -1,8 +1,8 @@
 package de.treona.musicPlugin.commands;
 
 import de.treona.musicPlugin.audio.AudioController;
-import de.treona.musicPlugin.audio.AudioUtils;
 import de.treona.musicPlugin.audio.GuildMusicManager;
+import de.treona.musicPlugin.util.AudioMessageUtils;
 import de.treona.shelfs.commands.GuildCommand;
 import de.treona.shelfs.permission.Permission;
 import net.dv8tion.jda.core.entities.Member;
@@ -33,7 +33,7 @@ public class QueueCommand implements GuildCommand {
             textChannel.sendMessage("Queue got cleared.").queue();
             return;
         }
-        MessageEmbed messageEmbed = AudioUtils.buildQueueMessage(new ArrayList<>(guildMusicManager.scheduler.queue), 1, textChannel);
+        MessageEmbed messageEmbed = AudioMessageUtils.buildQueueMessage(new ArrayList<>(guildMusicManager.scheduler.queue), 1, textChannel);
         Message sendMessage = textChannel.sendMessage(messageEmbed).complete();
         sendMessage.addReaction("◀").queue();
         sendMessage.addReaction("▶").queue();
@@ -54,7 +54,7 @@ public class QueueCommand implements GuildCommand {
 //                    .append("`` ")
 //                    .append(audioTrack.getInfo().title)
 //                    .append(" ``(")
-//                    .append(AudioUtils.formatDuration(audioTrack.getDuration()))
+//                    .append(AudioMessageUtils.formatDuration(audioTrack.getDuration()))
 //                    .append(")``");
 //            if (i == elementsToShow) {
 //                break;

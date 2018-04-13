@@ -17,6 +17,13 @@ public class AudioPermissionUtil {
             return true;
         }
         GuildSettings guildSettings = configManager.getGuildSettings(member.getGuild());
-        return member.getRoles().contains(guildSettings.getBotRole());
+        return member.getRoles().contains(guildSettings.djRole);
+    }
+
+    public static boolean hasSettingsPermission(Member member) {
+        if (member.isOwner())
+            return true;
+        GuildSettings guildSettings = configManager.getGuildSettings(member.getGuild());
+        return member.getRoles().contains(guildSettings.settingsRole);
     }
 }

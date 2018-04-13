@@ -1,11 +1,11 @@
 package de.treona.musicPlugin.events;
 
 import de.treona.musicPlugin.audio.AudioController;
-import de.treona.musicPlugin.audio.AudioUtils;
 import de.treona.musicPlugin.audio.GuildMusicManager;
 import de.treona.musicPlugin.config.ConfigManager;
 import de.treona.musicPlugin.config.GuildSettings;
 import de.treona.musicPlugin.permission.AudioPermissionUtil;
+import de.treona.musicPlugin.util.AudioMessageUtils;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
@@ -52,18 +52,18 @@ public class VolumeListener extends ListenerAdapter {
         if (event.getReactionEmote().getName().equals("\uD83D\uDD0A")) {
             guildMusicManager.player.setVolume(Math.min(125, guildMusicManager.player.getVolume() + 15));
             newVolume = Math.min(125, guildMusicManager.player.getVolume());
-            message.editMessage(AudioUtils.buildVolumeMessage(this.audioController.getMusicManager(event.getGuild()), newVolume, true)).queue();
+            message.editMessage(AudioMessageUtils.buildVolumeMessage(this.audioController.getMusicManager(event.getGuild()), newVolume)).queue();
             saveUpdate = true;
         } else if (event.getReactionEmote().getName().equals("\uD83D\uDD09")) {
             guildMusicManager.player.setVolume(Math.max(3, guildMusicManager.player.getVolume() - 15));
             newVolume = Math.max(3, guildMusicManager.player.getVolume());
-            message.editMessage(AudioUtils.buildVolumeMessage(this.audioController.getMusicManager(event.getGuild()), newVolume, true)).queue();
+            message.editMessage(AudioMessageUtils.buildVolumeMessage(this.audioController.getMusicManager(event.getGuild()), newVolume)).queue();
             saveUpdate = true;
         }
         event.getReaction().removeReaction(event.getUser()).queue();
         if (saveUpdate) {
             GuildSettings guildSettings = this.configManager.getGuildSettings(event.getGuild());
-            guildSettings.setVolume(newVolume);
+            guildSettings.volume = newVolume;
             this.configManager.saveGuildSettings(event.getGuild(), guildSettings);
         }
     }

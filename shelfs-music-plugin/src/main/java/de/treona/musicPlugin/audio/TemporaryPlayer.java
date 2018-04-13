@@ -13,12 +13,21 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * Used to check if songs or tracks a valid.
+ */
 public class TemporaryPlayer {
 
     private final AudioPlayer player;
     private final TrackScheduler scheduler;
     private final AudioPlayerManager audioPlayerManager;
 
+    /**
+     * Creates an instance of a @{@link TrackScheduler} and @{@link AudioPlayer}
+     * make sure to destroy() your instance after usage.
+     *
+     * @param audioPlayerManager used to create a new @{@link AudioPlayer} instance.
+     */
     TemporaryPlayer(AudioPlayerManager audioPlayerManager) {
         this.audioPlayerManager = audioPlayerManager;
         this.player = audioPlayerManager.createPlayer();
@@ -26,7 +35,13 @@ public class TemporaryPlayer {
         this.player.addListener(scheduler);
     }
 
-    public boolean isValidPlaylist(String identifier) {
+    /**
+     * Checks if track(s) are present under a certain identifier.
+     *
+     * @param identifier place to check for tracks.
+     * @return @{@code true} if at least one track was loaded {@code false} if no track(s) could be loaded.
+     */
+    public boolean isValid(String identifier) {
         Future<Void> future = this.audioPlayerManager.loadItemOrdered(this, identifier, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
@@ -52,12 +67,15 @@ public class TemporaryPlayer {
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             e.printStackTrace();
         }
-        return scheduler.queue.size() > 1;
+        return scheduler.queue.size() > 0;
     }
 
+    /**
+     * Destroys the @{@link AudioPlayer} and the @{@link TrackScheduler}
+     * Not calling this could lead to a memory leak.
+     */
     public void destroy() {
         this.scheduler.queue.clear();
         this.player.destroy();
     }
-
 }
