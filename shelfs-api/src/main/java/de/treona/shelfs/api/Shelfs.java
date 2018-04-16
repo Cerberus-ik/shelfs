@@ -1,7 +1,8 @@
 package de.treona.shelfs.api;
 
 import com.sedmelluq.discord.lavaplayer.jdaudp.NativeAudioSendFactory;
-import de.treona.shelfs.api.events.Listener;
+import de.treona.shelfs.api.events.CommandListener;
+import de.treona.shelfs.api.events.ShelfsListenerAdapter;
 import de.treona.shelfs.api.plugin.PluginManager;
 import de.treona.shelfs.api.plugin.ShelfsPlugin;
 import de.treona.shelfs.commands.CommandManager;
@@ -57,7 +58,8 @@ public final class Shelfs {
         try {
             setJda(new JDABuilder(AccountType.BOT)
                     .setToken(configManager.getConfig().token)
-                    .addEventListener(new Listener(configManager.getConfig().commandPrefix))
+                    .addEventListener(new CommandListener(configManager.getConfig().commandPrefix))
+                    .addEventListener(new ShelfsListenerAdapter())
                     .setAudioSendFactory(new NativeAudioSendFactory())
                     .buildBlocking());
         } catch (LoginException | InterruptedException e) {
@@ -80,7 +82,7 @@ public final class Shelfs {
     }
 
     public static String getVersion() {
-        return "0.3.1";
+        return "0.4.0";
     }
 
     public static JDA getJda() {

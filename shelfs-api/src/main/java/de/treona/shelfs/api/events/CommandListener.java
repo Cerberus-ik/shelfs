@@ -5,11 +5,11 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-public class Listener extends ListenerAdapter {
+public class CommandListener extends ListenerAdapter {
 
     private String commandPrefix;
 
-    public Listener(String commandPrefix) {
+    public CommandListener(String commandPrefix) {
         this.commandPrefix = commandPrefix;
     }
 
