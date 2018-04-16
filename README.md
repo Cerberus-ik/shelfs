@@ -10,10 +10,35 @@ Note that you don't have to install/use a single one of them.
 - Util-Plugin
 - Update-Plugin (Kotlin)
 
+### Plugin installation
+Just drag an drop any plugin jars you like in the plugins folder.
+Always be careful with plugins from unknown sources. They have the potential to
+steal your discord bot token. <br>
+**Plugins can steal your token!** <br>
+**Plugins have the exact same permission as the bot itself!**
+
 ### Create a plugin
+
+#### Plugin requirements:
+- A class that extends ``ShelfsPlugin``
+- A ``plugin.json`` in the very top of your plugin
+Everything else is optional <br>
+#### plugin.json
+The ``plugin.json`` contains the information Shelfs needs to load your plugin. **It is required!** <br>
+Every ``plugin.json`` is checked against this [Json Schema](https://github.com/Cerberus-ik/shelfs/blob/master/shelfs-api/src/main/resources/schemas/pluginDescriptionSchema-1.0.json)
+```json
+{
+  "author": "Your Name",
+  "version": "1.0.0",
+  "name": "Your plugin name",
+  "main": "com.example.package.MyPlugin",
+  "pluginDescription": "This is a test plugin"
+}
+```
+
 ##### Java
 ```java
-public class Main extends ShelfsPlugin {
+public class MyPlugin extends ShelfsPlugin {
     @Override
     public void onEnable() {
         Shelfs.getJda().addEventListener(new EventListener());
@@ -23,7 +48,7 @@ public class Main extends ShelfsPlugin {
 ```
 ##### Kotlin
 ```kotlin
-class Main : ShelfsPlugin() {
+class MyPlugin : ShelfsPlugin() {
     override fun onEnable(){ 
         Shelfs.getCommandManager().registerCommand(this, "test", TestCommand())
 		Shelfs.getJda().addEventListener(EventListener())
@@ -31,13 +56,10 @@ class Main : ShelfsPlugin() {
 }
 ```
 
-### Plugin installation
-Just drag an drop any plugin jars you like in the plugins folder.
-Always be careful with plugins from unknown sources. They have the potential to
-steal your discord bot token. <br>
-**Plugins can steal your token!** <br>
-**Plugins have the exact same permission as the bot itself!**
-
+##### Events
+Since 0.4.0 Shelfs has it's own events. If you want to listen to them you need a class that extends the ``ShelfsListenerAdapter``. <br>
+It not only gives you access to the Shelf events but although every JDA event. It is recommended to use this Adapter instead 
+of the default one.
 
 ### Road map
 - Add an authentication check to the database
