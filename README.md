@@ -21,7 +21,7 @@ steal your discord bot token. <br>
 
 #### Plugin requirements:
 - A class that extends ``ShelfsPlugin``
-- A ``plugin.json`` in the very top of your plugin
+- A ``plugin.json`` in the very top of your plugin <br>
 Everything else is optional <br>
 #### plugin.json
 The ``plugin.json`` contains the information Shelfs needs to load your plugin. **It is required!** <br>

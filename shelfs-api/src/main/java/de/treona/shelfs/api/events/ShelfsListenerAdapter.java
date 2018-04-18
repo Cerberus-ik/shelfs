@@ -1,8 +1,8 @@
 package de.treona.shelfs.api.events;
 
-import de.treona.shelfs.api.events.listener.command.CommandEvent;
-import de.treona.shelfs.api.events.listener.command.GuildCommandEvent;
-import de.treona.shelfs.api.events.listener.command.PrivateCommandEvent;
+import de.treona.shelfs.api.events.command.CommandEvent;
+import de.treona.shelfs.api.events.command.GuildCommandEvent;
+import de.treona.shelfs.api.events.command.PrivateCommandEvent;
 import de.treona.shelfs.api.events.reaction.ReactionMessageEvent;
 import de.treona.shelfs.api.events.reaction.ReactionMessageReactionAddEvent;
 import de.treona.shelfs.api.events.reaction.ReactionMessageSendEvent;
@@ -42,10 +42,10 @@ public class ShelfsListenerAdapter extends ListenerAdapter {
         }
         if (event instanceof ReactionMessageEvent) {
             if (event instanceof ReactionMessageSendEvent)
-                this.onReactionMessageSendEvent((ReactionMessageSendEvent) event);
+                onReactionMessageSendEvent((ReactionMessageSendEvent) event);
             else if (event instanceof ReactionMessageReactionAddEvent)
-                this.onReactionMessageReactionAddEvent((ReactionMessageReactionAddEvent) event);
-            else this.onReactionMessageEvent((ReactionMessageEvent) event);
+                onReactionMessageReactionAddEvent((ReactionMessageReactionAddEvent) event);
+            else onReactionMessageEvent((ReactionMessageEvent) event);
         }
     }
 }

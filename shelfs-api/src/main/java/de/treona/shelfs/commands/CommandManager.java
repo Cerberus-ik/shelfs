@@ -1,18 +1,23 @@
 package de.treona.shelfs.commands;
 
+import de.treona.shelfs.api.Shelfs;
+import de.treona.shelfs.api.events.ShelfsListenerAdapter;
+import de.treona.shelfs.api.events.command.GuildCommandEvent;
+import de.treona.shelfs.api.events.command.PrivateCommandEvent;
 import de.treona.shelfs.api.plugin.ShelfsPlugin;
 import de.treona.shelfs.permission.Permission;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 @SuppressWarnings("unused")
-public class CommandManager {
+public class CommandManager extends ShelfsListenerAdapter {
 
     private HashMap<CommandData, Command> commands;
     private String commandPrefix;
@@ -103,10 +108,21 @@ public class CommandManager {
             channel.sendMessage("Sorry but you don't have enough permission to execute this command.").queue();
             return;
         }
+        if (commandData == null) {
+            throw new NullPointerException("Command data is null.");
+        }
         if (channel instanceof TextChannel) {
             ((GuildCommand) command).execute(message.getMember(), message, (TextChannel) channel);
+            Shelfs.getJda().getRegisteredListeners().forEach(listener -> {
+                ListenerAdapter adapter = (ListenerAdapter) listener;
+                adapter.onEvent(new GuildCommandEvent(channel.getJDA(), (GuildCommand) command, commandData.plugin, message.getAuthor(), message.getGuild()));
+            });
         } else {
             ((PrivateCommand) command).execute(message.getAuthor(), message, (PrivateChannel) channel);
+            Shelfs.getJda().getRegisteredListeners().forEach(listener -> {
+                ListenerAdapter adapter = (ListenerAdapter) listener;
+                adapter.onEvent(new PrivateCommandEvent(channel.getJDA(), (PrivateCommand) command, commandData.plugin, message.getAuthor()));
+            });
         }
     }
 

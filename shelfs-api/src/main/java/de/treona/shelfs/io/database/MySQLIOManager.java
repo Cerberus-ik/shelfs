@@ -27,6 +27,11 @@ public class MySQLIOManager implements IOManager {
         this.dataSource.setServerName(databaseCredentials.getHost());
         this.dataSource.setPort(databaseCredentials.getPort());
         try {
+            this.dataSource.setUseSSL(true);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        try {
             this.dataSource.setServerTimezone("UTC");
             //TODO add time zone support
         } catch (SQLException e) {

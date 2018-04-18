@@ -1,4 +1,4 @@
-package de.treona.shelfs.api.events.listener.command;
+package de.treona.shelfs.api.events.command;
 
 import de.treona.shelfs.api.plugin.ShelfsPlugin;
 import de.treona.shelfs.commands.Command;
