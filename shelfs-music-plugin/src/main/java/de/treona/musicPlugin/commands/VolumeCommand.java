@@ -1,16 +1,17 @@
 package de.treona.musicPlugin.commands;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import de.treona.musicPlugin.audio.AudioController;
+import de.treona.musicPlugin.audio.GuildMusicManager;
+import de.treona.musicPlugin.common.VolumeReactionMessage;
 import de.treona.musicPlugin.config.ConfigManager;
-import de.treona.musicPlugin.config.GuildSettings;
 import de.treona.musicPlugin.permission.DJPermission;
 import de.treona.musicPlugin.util.AudioMessageUtils;
+import de.treona.musicPlugin.util.VolumeUtil;
+import de.treona.shelfs.api.message.ReactionMessageUtil;
 import de.treona.shelfs.commands.GuildCommand;
 import de.treona.shelfs.permission.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
 
 public class VolumeCommand implements GuildCommand {
@@ -26,25 +27,26 @@ public class VolumeCommand implements GuildCommand {
     @Override
     public void execute(Member member, Message message, TextChannel textChannel) {
         String[] args = message.getContentRaw().split(" ");
-        AudioPlayer audioPlayer = this.audioController.getMusicManager(member.getGuild()).player;
+        GuildMusicManager guildMusicManager = this.audioController.getMusicManager(member.getGuild());
         if (args.length <= 1) {
-            MessageEmbed messageEmbed = AudioMessageUtils.buildVolumeMessage(this.audioController.getMusicManager(member.getGuild()), audioPlayer.getVolume());
-            Message sendMessage = textChannel.sendMessage(messageEmbed).complete();
-            sendMessage.addReaction("\uD83D\uDD09").queue();
-            sendMessage.addReaction("\uD83D\uDD0A").queue();
+            VolumeReactionMessage reactionMessage = AudioMessageUtils.buildVolumeReactionMessage(guildMusicManager,
+                    this.configManager,
+                    AudioMessageUtils.buildVolumeMessageEmbed(guildMusicManager.player.getVolume(),
+                            guildMusicManager,
+                            this.configManager));
+            ReactionMessageUtil.sendMessage(reactionMessage, textChannel);
         } else {
             try {
                 int newVolume = Math.max(3, Math.min(125, Integer.parseInt(args[1])));
-                audioPlayer.setVolume(newVolume);
-                GuildSettings guildSettings = this.configManager.getGuildSettings(member.getGuild());
-                guildSettings.volume = newVolume;
-                this.configManager.saveGuildSettings(member.getGuild(), guildSettings);
-                MessageEmbed messageEmbed = AudioMessageUtils.buildVolumeMessage(this.audioController.getMusicManager(member.getGuild()), audioPlayer.getVolume());
-                Message sendMessage = textChannel.sendMessage(messageEmbed).complete();
-                sendMessage.addReaction("\uD83D\uDD09").queue();
-                sendMessage.addReaction("\uD83D\uDD0A").queue();
+                VolumeUtil.setVolume(newVolume, guildMusicManager, this.configManager);
+                VolumeReactionMessage reactionMessage = AudioMessageUtils.buildVolumeReactionMessage(guildMusicManager,
+                        this.configManager,
+                        AudioMessageUtils.buildVolumeMessageEmbed(guildMusicManager.player.getVolume(),
+                                guildMusicManager,
+                                this.configManager));
+                ReactionMessageUtil.sendMessage(reactionMessage, textChannel);
             } catch (NumberFormatException e) {
-                textChannel.sendMessage("``" + args[1] + "`` is not a valid volume level. (3 - 125)").queue();
+                textChannel.sendMessage("``" + args[1] + "`` is not a valid volume level. (" + VolumeUtil.MIN_VOLUME + " - " + VolumeUtil.MAX_VOLUME + ")").queue();
             }
         }
     }

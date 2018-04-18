@@ -1,9 +1,11 @@
 package de.treona.musicPlugin.util;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import de.treona.musicPlugin.audio.GuildMusicManager;
+import de.treona.musicPlugin.common.VolumeReactionMessage;
+import de.treona.musicPlugin.config.ConfigManager;
 import de.treona.shelfs.api.Shelfs;
+import de.treona.shelfs.api.message.ReactionMessageBuilder;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
@@ -194,14 +196,22 @@ public class AudioMessageUtils {
         }
     }
 
-    public static MessageEmbed buildVolumeMessage(GuildMusicManager guildMusicManager, int newVolume) {
-        AudioPlayer audioPlayer = guildMusicManager.player;
-        audioPlayer.setVolume(newVolume);
+    public static MessageEmbed buildVolumeMessageEmbed(int volume, GuildMusicManager guildMusicManager, ConfigManager configManager) {
+        VolumeUtil.setVolume(volume, guildMusicManager, configManager);
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setColor(Color.yellow);
-        embedBuilder.addField(buildVolumeMessageField(3, 125, newVolume));
+        embedBuilder.addField(buildVolumeMessageField(VolumeUtil.MIN_VOLUME, VolumeUtil.MAX_VOLUME, guildMusicManager.player.getVolume()));
         return embedBuilder.build();
     }
+
+    public static VolumeReactionMessage buildVolumeReactionMessage(GuildMusicManager guildMusicManager, ConfigManager configManager, MessageEmbed messageEmbed) {
+        ReactionMessageBuilder reactionMessageBuilder = new ReactionMessageBuilder();
+        reactionMessageBuilder.setMessage(messageEmbed);
+        reactionMessageBuilder.addReaction("\uD83D\uDD09", () -> VolumeUtil.quieter(guildMusicManager, configManager));
+        reactionMessageBuilder.addReaction("\uD83D\uDD0A", () -> VolumeUtil.louder(guildMusicManager, configManager));
+        return new VolumeReactionMessage(reactionMessageBuilder.build());
+    }
+
 
     @SuppressWarnings("SameParameterValue")
     private static MessageEmbed.Field buildVolumeMessageField(double minVolume, double maxVolume, double volume) {
