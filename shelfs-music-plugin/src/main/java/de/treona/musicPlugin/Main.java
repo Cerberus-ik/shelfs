@@ -6,7 +6,9 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import de.treona.musicPlugin.audio.AudioController;
 import de.treona.musicPlugin.commands.*;
 import de.treona.musicPlugin.config.ConfigManager;
-import de.treona.musicPlugin.events.*;
+import de.treona.musicPlugin.events.NowPlayingListener;
+import de.treona.musicPlugin.events.PlayerLeaveListener;
+import de.treona.musicPlugin.events.SearchListener;
 import de.treona.musicPlugin.permission.AudioPermissionUtil;
 import de.treona.shelfs.api.Shelfs;
 import de.treona.shelfs.api.plugin.ShelfsPlugin;
@@ -24,8 +26,8 @@ public class Main extends ShelfsPlugin {
         AudioSourceManagers.registerRemoteSources(audioPlayerManager);
         AudioController audioController = new AudioController(configManager);
 
-        Shelfs.getJda().addEventListener(new VolumeListener(audioController, configManager));
-        Shelfs.getJda().addEventListener(new QueueListener(audioController));
+        //Shelfs.getJda().addEventListener(new VolumeListener(audioController, configManager));
+        //Shelfs.getJda().addEventListener(new QueueListener(audioController));
         Shelfs.getJda().addEventListener(new PlayerLeaveListener(audioController));
         Shelfs.getJda().addEventListener(new NowPlayingListener(audioController));
         Shelfs.getJda().addEventListener(new SearchListener(audioController, configManager));

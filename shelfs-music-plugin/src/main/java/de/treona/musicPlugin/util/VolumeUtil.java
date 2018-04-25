@@ -12,8 +12,8 @@ public class VolumeUtil {
     public static void setVolume(int volume, GuildMusicManager guildMusicManager, ConfigManager configManager) {
         int oldVolume = guildMusicManager.player.getVolume();
         int newVolume = Math.max(3, Math.min(volume, 125));
-        guildMusicManager.player.setVolume(newVolume);
         if (oldVolume != newVolume) {
+            guildMusicManager.player.setVolume(newVolume);
             GuildSettings guildSettings = configManager.getGuildSettings(guildMusicManager.getGuild());
             guildSettings.volume = newVolume;
             configManager.saveGuildSettings(guildMusicManager.getGuild(), guildSettings);

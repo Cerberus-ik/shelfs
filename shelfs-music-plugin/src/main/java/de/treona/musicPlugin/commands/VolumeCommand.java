@@ -2,11 +2,11 @@ package de.treona.musicPlugin.commands;
 
 import de.treona.musicPlugin.audio.AudioController;
 import de.treona.musicPlugin.audio.GuildMusicManager;
-import de.treona.musicPlugin.common.VolumeReactionMessage;
 import de.treona.musicPlugin.config.ConfigManager;
 import de.treona.musicPlugin.permission.DJPermission;
 import de.treona.musicPlugin.util.AudioMessageUtils;
 import de.treona.musicPlugin.util.VolumeUtil;
+import de.treona.shelfs.api.message.ReactionMessage;
 import de.treona.shelfs.api.message.ReactionMessageUtil;
 import de.treona.shelfs.commands.GuildCommand;
 import de.treona.shelfs.permission.Permission;
@@ -29,7 +29,7 @@ public class VolumeCommand implements GuildCommand {
         String[] args = message.getContentRaw().split(" ");
         GuildMusicManager guildMusicManager = this.audioController.getMusicManager(member.getGuild());
         if (args.length <= 1) {
-            VolumeReactionMessage reactionMessage = AudioMessageUtils.buildVolumeReactionMessage(guildMusicManager,
+            ReactionMessage reactionMessage = AudioMessageUtils.buildVolumeReactionMessage(guildMusicManager,
                     this.configManager,
                     AudioMessageUtils.buildVolumeMessageEmbed(guildMusicManager.player.getVolume(),
                             guildMusicManager,
@@ -39,7 +39,7 @@ public class VolumeCommand implements GuildCommand {
             try {
                 int newVolume = Math.max(3, Math.min(125, Integer.parseInt(args[1])));
                 VolumeUtil.setVolume(newVolume, guildMusicManager, this.configManager);
-                VolumeReactionMessage reactionMessage = AudioMessageUtils.buildVolumeReactionMessage(guildMusicManager,
+                ReactionMessage reactionMessage = AudioMessageUtils.buildVolumeReactionMessage(guildMusicManager,
                         this.configManager,
                         AudioMessageUtils.buildVolumeMessageEmbed(guildMusicManager.player.getVolume(),
                                 guildMusicManager,

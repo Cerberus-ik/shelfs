@@ -2,9 +2,9 @@ package de.treona.musicPlugin.util;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import de.treona.musicPlugin.audio.GuildMusicManager;
-import de.treona.musicPlugin.common.VolumeReactionMessage;
 import de.treona.musicPlugin.config.ConfigManager;
 import de.treona.shelfs.api.Shelfs;
+import de.treona.shelfs.api.message.ReactionMessage;
 import de.treona.shelfs.api.message.ReactionMessageBuilder;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -204,12 +204,22 @@ public class AudioMessageUtils {
         return embedBuilder.build();
     }
 
-    public static VolumeReactionMessage buildVolumeReactionMessage(GuildMusicManager guildMusicManager, ConfigManager configManager, MessageEmbed messageEmbed) {
+    public static ReactionMessage buildVolumeReactionMessage(GuildMusicManager guildMusicManager, ConfigManager configManager, MessageEmbed messageEmbed) {
         ReactionMessageBuilder reactionMessageBuilder = new ReactionMessageBuilder();
         reactionMessageBuilder.setMessage(messageEmbed);
-        reactionMessageBuilder.addReaction("\uD83D\uDD09", () -> VolumeUtil.quieter(guildMusicManager, configManager));
-        reactionMessageBuilder.addReaction("\uD83D\uDD0A", () -> VolumeUtil.louder(guildMusicManager, configManager));
-        return new VolumeReactionMessage(reactionMessageBuilder.build());
+        reactionMessageBuilder.addReaction("\uD83D\uDD09",
+                (reaction, user) -> new Thread(() -> {
+                    VolumeUtil.quieter(guildMusicManager, configManager);
+                    Message message = reaction.getChannel().getMessageById(reaction.getMessageId()).complete();
+                    message.editMessage(AudioMessageUtils.buildVolumeMessageEmbed(guildMusicManager.player.getVolume(), guildMusicManager, configManager)).queue();
+                }).start());
+        reactionMessageBuilder.addReaction("\uD83D\uDD0A",
+                (reaction, user) -> new Thread(() -> {
+                    VolumeUtil.louder(guildMusicManager, configManager);
+                    Message message = reaction.getChannel().getMessageById(reaction.getMessageId()).complete();
+                    message.editMessage(AudioMessageUtils.buildVolumeMessageEmbed(guildMusicManager.player.getVolume(), guildMusicManager, configManager)).queue();
+                }).start());
+        return reactionMessageBuilder.build();
     }
 
 

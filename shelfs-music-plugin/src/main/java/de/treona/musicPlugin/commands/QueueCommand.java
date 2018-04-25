@@ -1,8 +1,12 @@
 package de.treona.musicPlugin.commands;
 
 import de.treona.musicPlugin.audio.AudioController;
+import de.treona.musicPlugin.audio.AudioUtils;
 import de.treona.musicPlugin.audio.GuildMusicManager;
 import de.treona.musicPlugin.util.AudioMessageUtils;
+import de.treona.musicPlugin.util.QueueUtil;
+import de.treona.shelfs.api.message.ReactionMessageBuilder;
+import de.treona.shelfs.api.message.ReactionMessageUtil;
 import de.treona.shelfs.commands.GuildCommand;
 import de.treona.shelfs.permission.Permission;
 import net.dv8tion.jda.core.entities.Member;
@@ -34,34 +38,34 @@ public class QueueCommand implements GuildCommand {
             return;
         }
         MessageEmbed messageEmbed = AudioMessageUtils.buildQueueMessage(new ArrayList<>(guildMusicManager.scheduler.queue), 1, textChannel);
-        Message sendMessage = textChannel.sendMessage(messageEmbed).complete();
-        sendMessage.addReaction("◀").queue();
-        sendMessage.addReaction("▶").queue();
-//        int elementsToShow = 10;
-//        if (guildMusicManager.scheduler.queue.size() < elementsToShow) {
-//            elementsToShow = guildMusicManager.scheduler.queue.size();
-//        }
-//        StringBuilder stringBuilder = new StringBuilder();
-//        stringBuilder.append("There are ")
-//                .append(guildMusicManager.scheduler.queue.size())
-//                .append(" tracks in the queue.")
-//                .append(System.lineSeparator());
-//        int i = 1;
-//        for (AudioTrack audioTrack : guildMusicManager.scheduler.queue) {
-//            stringBuilder.append(System.lineSeparator())
-//                    .append("Queue position: ``")
-//                    .append(i)
-//                    .append("`` ")
-//                    .append(audioTrack.getInfo().title)
-//                    .append(" ``(")
-//                    .append(AudioMessageUtils.formatDuration(audioTrack.getDuration()))
-//                    .append(")``");
-//            if (i == elementsToShow) {
-//                break;
-//            }
-//            i++;
-//        }
-//        textChannel.sendMessage(stringBuilder.toString()).queue();
+        ReactionMessageBuilder reactionMessageBuilder = new ReactionMessageBuilder();
+        reactionMessageBuilder.setMessage(messageEmbed);
+
+        reactionMessageBuilder.addReaction("◀", (reaction, user) -> {
+            if (!AudioUtils.joinMember(member) && !member.getGuild().getAudioManager().isConnected())
+                return;
+            new Thread(() -> {
+                Message reactedMessage = reaction.getChannel().getMessageById(reaction.getMessageId()).complete();
+                int currentSite = QueueUtil.getCurrentSite(reactedMessage, guildMusicManager);
+                if (currentSite - 1 < 1) {
+                    return;
+                }
+                reactedMessage.editMessage(AudioMessageUtils.buildQueueMessage(new ArrayList<>(guildMusicManager.scheduler.queue), currentSite - 1, reaction.getChannel())).queue();
+            }).start();
+        });
+        reactionMessageBuilder.addReaction("▶", (reaction, user) -> {
+            if (!AudioUtils.joinMember(member) && !member.getGuild().getAudioManager().isConnected())
+                return;
+            new Thread(() -> {
+                Message reactedMessage = reaction.getChannel().getMessageById(reaction.getMessageId()).complete();
+                int currentSite = QueueUtil.getCurrentSite(reactedMessage, guildMusicManager);
+                if (currentSite + 1 > QueueUtil.sites(guildMusicManager.scheduler.queue)) {
+                    return;
+                }
+                reactedMessage.editMessage(AudioMessageUtils.buildQueueMessage(new ArrayList<>(guildMusicManager.scheduler.queue), currentSite + 1, reaction.getChannel())).queue();
+            }).start();
+        });
+        ReactionMessageUtil.sendMessage(reactionMessageBuilder.build(), textChannel, true);
     }
 
     @Override
