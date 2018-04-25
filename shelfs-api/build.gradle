@@ -1,7 +1,7 @@
 ext.kotlin_version = '1.2.31'
 apply plugin: 'maven-publish'
 group 'cerberus'
-version '0.4.6'
+version '0.4.12'
 
 apply plugin: 'maven-publish'
 apply plugin: 'java'

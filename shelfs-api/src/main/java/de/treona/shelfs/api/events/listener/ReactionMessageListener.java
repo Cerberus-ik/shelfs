@@ -27,7 +27,7 @@ public class ReactionMessageListener extends ShelfsListenerAdapter {
                 ReactionMessage reactionMessage = ReactionMessageUtil.getMessage(message.getId());
                 event.getReaction().removeReaction(event.getUser()).queue();
                 if (reactionMessage.getPossibleReactions().keySet().contains(event.getReaction().getReactionEmote().getName())) {
-                    reactionMessage.onReaction(event.getReaction());
+                    reactionMessage.onReaction(event.getReaction(), event.getUser());
                     event.getJDA().getRegisteredListeners().forEach(listener -> {
                         ListenerAdapter adapter = (ListenerAdapter) listener;
                         adapter.onEvent(new ReactionMessageReactionAddEvent(event.getJDA(), reactionMessage, event.getReaction(), event.getUser(), event.getGuild()));
