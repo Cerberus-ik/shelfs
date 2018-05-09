@@ -98,6 +98,6 @@ public class SearchListener extends ListenerAdapter {
         if (textChannel != null) {
             AudioMessageUtils.sendQueueInfo(textChannel, tracks.stream().filter(streamTrack -> streamTrack.equals(track)).collect(Collectors.toList()), guildMusicManager);
         }
-        this.audioController.getMusicManager(guild).scheduler.queue(track);
+        this.audioController.getMusicManager(guild).scheduler.queue(track, false);
     }
 }

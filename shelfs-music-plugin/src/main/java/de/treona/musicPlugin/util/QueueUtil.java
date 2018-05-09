@@ -5,11 +5,11 @@ import de.treona.musicPlugin.audio.GuildMusicManager;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 
-import java.util.Queue;
+import java.util.LinkedHashMap;
 
 public class QueueUtil {
 
-    public static int sites(Queue<AudioTrack> queue) {
+    public static int sites(LinkedHashMap<AudioTrack, Boolean> queue) {
         return (int) Math.ceil(queue.size() / 10) + 1;
     }
 

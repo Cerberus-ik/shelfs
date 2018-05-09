@@ -13,6 +13,7 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 
 import java.awt.*;
+import java.util.Iterator;
 
 public class SkipCommand implements GuildCommand {
 
@@ -40,8 +41,10 @@ public class SkipCommand implements GuildCommand {
             }
             GuildMusicManager musicManager = this.audioController.getMusicManager(member.getGuild());
             songsToSkip = Math.min(songsToSkip, musicManager.scheduler.queue.size() + 1);
+            Iterator<AudioTrack> trackIterator = musicManager.scheduler.queue.keySet().iterator();
             for (int i = 0; i < songsToSkip - 1; i++)
-                musicManager.scheduler.queue.poll();
+                if (trackIterator.hasNext())
+                    musicManager.scheduler.queue.remove(trackIterator.next());
             textChannel.sendMessage("Skipping " + songsToSkip + " songs.").queue();
             musicManager.scheduler.nextTrack();
         } catch (Exception e) {

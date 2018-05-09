@@ -45,13 +45,13 @@ public class TemporaryPlayer {
         Future<Void> future = this.audioPlayerManager.loadItemOrdered(this, identifier, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
-                scheduler.queue(track);
+                scheduler.queue(track, false);
             }
 
             @Override
             public void playlistLoaded(AudioPlaylist playlist) {
                 List<AudioTrack> tracks = playlist.getTracks();
-                tracks.forEach(scheduler::queue);
+                tracks.forEach(track -> scheduler.queue(track, false));
             }
 
             @Override

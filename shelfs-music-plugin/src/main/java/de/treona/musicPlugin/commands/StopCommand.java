@@ -20,7 +20,6 @@ public class StopCommand implements GuildCommand {
     @Override
     public void execute(Member member, Message message, TextChannel textChannel) {
         GuildMusicManager guildMusicManager = this.audioController.getMusicManager(member.getGuild());
-        guildMusicManager.scheduler.queue.clear();
         guildMusicManager.player.stopTrack();
         guildMusicManager.player.setPaused(false);
         textChannel.sendMessage("Stopped all playbacks.").queue();

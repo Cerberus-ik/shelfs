@@ -14,8 +14,6 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
 
-import java.util.ArrayList;
-
 public class QueueCommand implements GuildCommand {
 
     private AudioController audioController;
@@ -37,7 +35,7 @@ public class QueueCommand implements GuildCommand {
             textChannel.sendMessage("Queue got cleared.").queue();
             return;
         }
-        MessageEmbed messageEmbed = AudioMessageUtils.buildQueueMessage(new ArrayList<>(guildMusicManager.scheduler.queue), 1, textChannel);
+        MessageEmbed messageEmbed = AudioMessageUtils.buildQueueMessage(guildMusicManager.scheduler.queue, 1, textChannel);
         ReactionMessageBuilder reactionMessageBuilder = new ReactionMessageBuilder();
         reactionMessageBuilder.setMessage(messageEmbed);
 
@@ -50,7 +48,7 @@ public class QueueCommand implements GuildCommand {
                 if (currentSite - 1 < 1) {
                     return;
                 }
-                reactedMessage.editMessage(AudioMessageUtils.buildQueueMessage(new ArrayList<>(guildMusicManager.scheduler.queue), currentSite - 1, reaction.getChannel())).queue();
+                reactedMessage.editMessage(AudioMessageUtils.buildQueueMessage(guildMusicManager.scheduler.queue, currentSite - 1, reaction.getChannel())).queue();
             }).start();
         });
         reactionMessageBuilder.addReaction("▶", (reaction, user) -> {
@@ -62,7 +60,7 @@ public class QueueCommand implements GuildCommand {
                 if (currentSite + 1 > QueueUtil.sites(guildMusicManager.scheduler.queue)) {
                     return;
                 }
-                reactedMessage.editMessage(AudioMessageUtils.buildQueueMessage(new ArrayList<>(guildMusicManager.scheduler.queue), currentSite + 1, reaction.getChannel())).queue();
+                reactedMessage.editMessage(AudioMessageUtils.buildQueueMessage(guildMusicManager.scheduler.queue, currentSite + 1, reaction.getChannel())).queue();
             }).start();
         });
         ReactionMessageUtil.sendMessage(reactionMessageBuilder.build(), textChannel, true);

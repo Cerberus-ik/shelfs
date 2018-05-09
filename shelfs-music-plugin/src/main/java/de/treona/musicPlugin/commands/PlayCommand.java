@@ -36,9 +36,8 @@ public class PlayCommand implements GuildCommand {
                 player.setPaused(false);
                 textChannel.sendMessage("Playback as been resumed.").queue();
             }
-            if (player.getPlayingTrack() == null) {
+            if (player.getPlayingTrack() == null)
                 trackScheduler.nextTrack();
-            }
         } else {
             if (args.length > 2 && args[1].equalsIgnoreCase("now")) {
                 this.audioController.load(this.audioController.getMusicManager(member.getGuild()),

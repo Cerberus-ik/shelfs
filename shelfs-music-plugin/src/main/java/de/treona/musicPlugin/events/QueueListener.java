@@ -9,8 +9,6 @@ import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-import java.util.ArrayList;
-
 public class QueueListener extends ListenerAdapter {
 
     private AudioController audioController;
@@ -49,11 +47,11 @@ public class QueueListener extends ListenerAdapter {
         }
         if (event.getReactionEmote().getName().equals("◀")) {
             if (currentSite != 1) {
-                message.editMessage(AudioMessageUtils.buildQueueMessage(new ArrayList<>(guildMusicManager.scheduler.queue), currentSite - 1, event.getChannel())).queue();
+                message.editMessage(AudioMessageUtils.buildQueueMessage(guildMusicManager.scheduler.queue, currentSite - 1, event.getChannel())).queue();
             }
         } else if (event.getReactionEmote().getName().equals("▶")) {
             if (currentSite != sites) {
-                message.editMessage(AudioMessageUtils.buildQueueMessage(new ArrayList<>(guildMusicManager.scheduler.queue), currentSite + 1, event.getChannel())).queue();
+                message.editMessage(AudioMessageUtils.buildQueueMessage(guildMusicManager.scheduler.queue, currentSite + 1, event.getChannel())).queue();
             }
         }
         event.getReaction().removeReaction(event.getUser()).queue();

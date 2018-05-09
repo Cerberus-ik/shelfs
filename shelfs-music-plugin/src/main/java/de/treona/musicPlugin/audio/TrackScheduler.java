@@ -10,17 +10,14 @@ import de.treona.shelfs.io.logger.LogLevel;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 import static java.lang.Thread.sleep;
 
 public class TrackScheduler extends AudioEventAdapter {
 
     private final AudioPlayer player;
-    public Queue<AudioTrack> queue;
+    public LinkedHashMap<AudioTrack, Boolean> queue;
     public AudioTrack lastTrack;
     private boolean repeating = false;
     private GuildMusicManager guildMusicManager;
@@ -31,24 +28,20 @@ public class TrackScheduler extends AudioEventAdapter {
 
     TrackScheduler(AudioPlayer player, GuildMusicManager guildMusicManager, AudioController audioController, String autoPlaylist, TextChannel textChannel, Guild guild) {
         this.player = player;
-        this.queue = new LinkedList<>();
+        this.queue = new LinkedHashMap<>();
         this.guildMusicManager = guildMusicManager;
         this.audioController = audioController;
         this.autoPlaylist = autoPlaylist;
         this.guild = guild;
-        if (textChannel == null && guildMusicManager != null) {
+        if (textChannel == null && guildMusicManager != null)
             this.textChannel = guildMusicManager.getGuild().getDefaultChannel();
-        } else {
+        else
             this.textChannel = textChannel;
-        }
     }
 
-    public void queue(AudioTrack track) {
-        // Calling startTrack with the noInterrupt set to true will start the track only if nothing is currently playing. If
-        // something is playing, it returns false and does nothing. In that case the player was already playing so this
-        // track goes to the queue instead.
+    public void queue(AudioTrack track, boolean autoPlaylist) {
         if (!player.startTrack(track, true)) {
-            queue.offer(track);
+            queue.put(track, autoPlaylist);
         }
     }
 
@@ -56,16 +49,19 @@ public class TrackScheduler extends AudioEventAdapter {
      * Start the next track, stopping the current one if it is playing.
      */
     public void nextTrack() {
-        AudioTrack audioTrack = this.queue.poll();
+        AudioTrack audioTrack = this.getNextTrack();
         if (audioTrack == null && this.autoPlaylist != null && this.autoPlaylist.length() > 2) {
             AudioMessageUtils.sendAutoPlaylistInformation(this.textChannel, "<" + this.autoPlaylist + ">");
             this.audioController.load(this.guildMusicManager,
                     this.textChannel,
                     this.autoPlaylist,
                     true,
-                    QueueAction.QUEUE_AND_DO_NOT_PLAY);
+                    QueueAction.QUEUE_AND_DO_NOT_PLAY_AUTO_PLAYLIST);
             this.shuffle();
-            audioTrack = this.queue.poll();
+            try {
+                audioTrack = this.queue.keySet().iterator().next();
+            } catch (NoSuchElementException ignore) {
+            }
         }
         if (audioTrack == null) {
             if (this.autoPlaylist != null && this.autoPlaylist.length() > 2) {
@@ -74,8 +70,21 @@ public class TrackScheduler extends AudioEventAdapter {
             }
             return;
         }
+        this.queue.remove(audioTrack);
         this.player.startTrack(audioTrack, false);
         AudioMessageUtils.sendPlayInfoToDJ(this.textChannel, audioTrack);
+    }
+
+    private AudioTrack getNextTrack() {
+        if (this.queue.containsValue(false))
+            return this.queue.keySet().stream().filter(track -> !this.queue.get(track)).findFirst().orElse(null);
+        else {
+            try {
+                return this.queue.keySet().iterator().next();
+            } catch (NoSuchElementException e) {
+                return null;
+            }
+        }
     }
 
     @Override
@@ -130,11 +139,15 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public void shuffle() {
-        Collections.shuffle((List<?>) this.queue);
+        LinkedHashMap<AudioTrack, Boolean> newQueue = new LinkedHashMap<>();
+        List<AudioTrack> tracks = new ArrayList<>(this.queue.keySet());
+        Collections.shuffle(tracks);
+        tracks.forEach(track -> newQueue.put(track, this.queue.get(track)));
+        this.queue = newQueue;
     }
 
     @SuppressWarnings("WeakerAccess")
     public int getPositionOfTrack(AudioTrack track) {
-        return new LinkedList<>(this.queue).lastIndexOf(track);
+        return new ArrayList<>(new LinkedHashMap<>(this.queue).keySet()).indexOf(track);
     }
 }

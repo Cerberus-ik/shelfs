@@ -26,8 +26,6 @@ public class Main extends ShelfsPlugin {
         AudioSourceManagers.registerRemoteSources(audioPlayerManager);
         AudioController audioController = new AudioController(configManager);
 
-        //Shelfs.getJda().addEventListener(new VolumeListener(audioController, configManager));
-        //Shelfs.getJda().addEventListener(new QueueListener(audioController));
         Shelfs.getJda().addEventListener(new PlayerLeaveListener(audioController));
         Shelfs.getJda().addEventListener(new NowPlayingListener(audioController));
         Shelfs.getJda().addEventListener(new SearchListener(audioController, configManager));

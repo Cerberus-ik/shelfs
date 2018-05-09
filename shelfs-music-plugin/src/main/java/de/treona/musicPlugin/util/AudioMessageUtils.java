@@ -13,6 +13,8 @@ import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -135,25 +137,26 @@ public class AudioMessageUtils {
         return stringBuilder.toString();
     }
 
-    public static MessageEmbed buildQueueMessage(List<AudioTrack> tracks, int site, MessageChannel channel) {
+    public static MessageEmbed buildQueueMessage(LinkedHashMap<AudioTrack, Boolean> queue, int site, MessageChannel channel) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         long duration = 0;
-        for (AudioTrack track : tracks) {
+        for (AudioTrack track : queue.keySet()) {
             if (track.getInfo().isStream) {
                 continue;
             }
             duration = duration + track.getDuration();
         }
-        embedBuilder.setTitle("Queue: " + tracks.size() + " ``[" + formatDuration(duration) + "]``");
+        embedBuilder.setTitle("Queue: " + queue.size() + " ``[" + formatDuration(duration) + "]``");
         embedBuilder.setColor(new Color(0, 255, 233));
-        embedBuilder.setFooter("Site: " + site + "/" + (((int) Math.ceil(tracks.size() / 10)) + 1), channel.getJDA().getSelfUser().getEffectiveAvatarUrl());
+        embedBuilder.setFooter("Site: " + site + "/" + (((int) Math.ceil(queue.size() / 10)) + 1), channel.getJDA().getSelfUser().getEffectiveAvatarUrl());
         int start = 10 * site - 10;
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = start; i < Math.min(tracks.size(), start + 10); i++) {
+        List<AudioTrack> tracks = new ArrayList<>(queue.keySet());
+        for (int i = start; i < Math.min(queue.size(), start + 10); i++) {
             AudioTrack track = tracks.get(i);
             String trackDuration = "∞";
-            if (!tracks.get(i).getInfo().isStream) {
-                trackDuration = formatDuration(tracks.get(i).getDuration());
+            if (!track.getInfo().isStream) {
+                trackDuration = formatDuration(track.getDuration());
             }
             if (track.getInfo().title.length() > 63) {
                 stringBuilder.append("``").append(i + 1).append(".) [").append(trackDuration).append("]`` ").append(track.getInfo().title, 0, 60).append("...");

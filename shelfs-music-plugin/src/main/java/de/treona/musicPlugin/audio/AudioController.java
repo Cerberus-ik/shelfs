@@ -88,29 +88,34 @@ public class AudioController {
                     AudioMessageUtils.sendSearchResults(channel, tracks, identifier);
                     return;
                 }
-                Queue<AudioTrack> queue = guildMusicManager.scheduler.queue;
+                LinkedHashMap<AudioTrack, Boolean> queue = guildMusicManager.scheduler.queue;
                 queue = this.addTracks(queue, filteredTracks, action);
                 guildMusicManager.scheduler.queue = queue;
                 AudioMessageUtils.sendQueueInfo(channel, filteredTracks, guildMusicManager);
                 if (action.equals(QueueAction.PLAY_NOW) && guildMusicManager.scheduler.queue.size() > 0) {
                     guildMusicManager.scheduler.nextTrack();
                 }
-                if (guildMusicManager.player.getPlayingTrack() == null && !action.equals(QueueAction.QUEUE_AND_DO_NOT_PLAY)) {
+                if (guildMusicManager.player.getPlayingTrack() == null &&
+                        (!action.equals(QueueAction.QUEUE_AND_DO_NOT_PLAY)
+                                && !action.equals(QueueAction.QUEUE_AND_DO_NOT_PLAY_AUTO_PLAYLIST))) {
                     guildMusicManager.scheduler.nextTrack();
                 }
             }
 
-            private Queue<AudioTrack> addTracks(Queue<AudioTrack> queue, List<AudioTrack> tracks, QueueAction action) {
+            private LinkedHashMap<AudioTrack, Boolean> addTracks(LinkedHashMap<AudioTrack, Boolean> queue, List<AudioTrack> tracks, QueueAction action) {
                 if (action.equals(QueueAction.QUEUE_AND_DO_NOT_PLAY) || action.equals(QueueAction.QUEUE_AND_PLAY)) {
-                    queue.addAll(tracks);
+                    tracks.forEach(track -> queue.put(track, false));
+                } else if (action.equals(QueueAction.QUEUE_AND_DO_NOT_PLAY_AUTO_PLAYLIST)) {
+                    tracks.forEach(track -> queue.put(track, true));
                 } else if (action.equals(QueueAction.PLAY_NEXT) || action.equals(QueueAction.PLAY_NOW)) {
-                    Queue<AudioTrack> tempQueue = new LinkedList<>(queue);
+                    Queue<AudioTrack> tempQueue = new LinkedList<>(queue.keySet());
                     queue.clear();
-                    tracks.forEach(queue::offer);
-                    tempQueue.forEach(queue::offer);
+                    tracks.forEach(track -> queue.put(track, false));
+                    tempQueue.forEach(track -> queue.put(track, false));
                 }
                 return queue;
             }
+
         });
         if (blocking) {
             try {
