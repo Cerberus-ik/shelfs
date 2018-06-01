@@ -62,7 +62,6 @@ It not only gives you access to the Shelf events but although every JDA event. I
 of the default one.
 
 ### Road map
-- Add an authentication check to the database
 - Custom plugin var support
 
 ### Dependencies
@@ -71,7 +70,7 @@ of the default one.
 - net.dv8tion:JDA
 - google-gson
 - logback
-- jcl-core
+- jcl-core ``Shelfs < 0.5``
 - junit
 - mysql-connector-java
 - lava-player (Plugin dependency)
