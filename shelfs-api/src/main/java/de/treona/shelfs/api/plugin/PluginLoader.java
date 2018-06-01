@@ -12,11 +12,11 @@ import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.xeustechnologies.jcl.JarClassLoader;
-import org.xeustechnologies.jcl.JclObjectFactory;
 
 import java.io.*;
-import java.net.MalformedURLException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -30,24 +30,56 @@ public class PluginLoader {
         if (file == null) {
             throw new NullPointerException("Plugin file can't be null.");
         }
+        URLClassLoader classLoader = null;
         try {
             final PluginDescription pluginDescription = this.loadPluginDescription(file);
-            JarClassLoader jarClassLoader = new JarClassLoader();
-            jarClassLoader.add(file.toURI().toURL());
-            JclObjectFactory factory = JclObjectFactory.getInstance();
-            ShelfsPlugin shelfsPlugin = (ShelfsPlugin) factory.create(jarClassLoader, pluginDescription.getMain());
-            shelfsPlugin.getClass().getSuperclass().getField("pluginDescription").set(shelfsPlugin, pluginDescription);
-            shelfsPlugin.getClass().getSuperclass().getField("logger").set(shelfsPlugin, new Logger(shelfsPlugin));
-            Shelfs.getLogger().logMessage("Loaded: " + shelfsPlugin.getPluginDescription().getName() + " v" + shelfsPlugin.getPluginDescription().getVersion(), LogLevel.INFO);
+            JarFile jarFile = new JarFile(file);
+            URL[] urls = {new URL("jar:file:" + file.getPath() + "!/")};
+            classLoader = new URLClassLoader(urls);
+            List<JarEntry> entries = JarEntryEnumerationParser.getValidEntries(jarFile.entries());
+            if (entries.size() == 0)
+                throw new IOException();
+            ShelfsPlugin shelfsPlugin = null;
+            for (JarEntry entry : entries) {
+                if (entry.getName().endsWith(".class")) {
+                    String className = entry.getName()
+                            .substring(0, entry.getName().length() - 6)
+                            .replaceAll("/", ".");
+                    if (pluginDescription.getMain().equals(className)) {
+                        Class<?> jarClass = classLoader.loadClass(className);
+                        Class<? extends ShelfsPlugin> pluginClass = jarClass.asSubclass(ShelfsPlugin.class);
+                        shelfsPlugin = pluginClass.getDeclaredConstructor().newInstance();
+                    } else
+                        classLoader.loadClass(className);
+                }
+            }
+            if (shelfsPlugin == null)
+                throw new ClassNotFoundException();
+            this.setPluginFields(shelfsPlugin, pluginDescription);
             return shelfsPlugin;
-        } catch (InvalidPluginDescriptionException | IllegalAccessException | NoSuchFieldException | MalformedURLException e) {
+        } catch (InvalidPluginDescriptionException | IllegalAccessException | IOException | InstantiationException | NoSuchMethodException | InvocationTargetException | ClassNotFoundException e) {
             e.printStackTrace();
         } catch (NoPluginDescriptionException e) {
             Shelfs.getLogger().logMessage("Plugin: " + file.getName() + " does not contain a valid plugin.json", LogLevel.ERROR);
         } catch (ClassCastException e) {
+            e.printStackTrace();
             Shelfs.getLogger().logMessage("Plugin: " + file.getName() + " has no valid main class.", LogLevel.ERROR);
+        } finally {
+            try {
+                classLoader.close();
+            } catch (Exception ignore) {
+            }
         }
         return null;
+    }
+
+    private void setPluginFields(ShelfsPlugin shelfsPlugin, PluginDescription pluginDescription) {
+        try {
+            shelfsPlugin.getClass().getSuperclass().getField("pluginDescription").set(shelfsPlugin, pluginDescription);
+            shelfsPlugin.getClass().getSuperclass().getField("logger").set(shelfsPlugin, new Logger(shelfsPlugin));
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
     }
 
     List<ShelfsPlugin> loadPlugins(File pluginDirectory) {
@@ -55,7 +87,9 @@ public class PluginLoader {
         assert files != null;
         List<ShelfsPlugin> plugins = new ArrayList<>();
         for (File file : files) {
-            plugins.add(this.loadPlugin(file));
+            ShelfsPlugin shelfsPlugin = this.loadPlugin(file);
+            plugins.add(shelfsPlugin);
+            Shelfs.getLogger().logMessage("Loaded: " + shelfsPlugin.getPluginDescription().getName() + " v" + shelfsPlugin.getPluginDescription().getVersion(), LogLevel.INFO);
         }
         plugins = plugins.stream().filter(Objects::nonNull).collect(Collectors.toList());
         return plugins;
@@ -76,7 +110,7 @@ public class PluginLoader {
             StringBuilder stringBuilder = new StringBuilder();
             bufferedReader.lines().forEach(stringBuilder::append);
             JSONObject pluginDescriptionJsonObject = new JSONObject(stringBuilder.toString());
-            if (this.isPluginDescriptionInvalid(pluginDescriptionJsonObject)) {
+            if (isPluginDescriptionInvalid(pluginDescriptionJsonObject)) {
                 throw new InvalidPluginDescriptionException();
             }
             pluginDescription = new Gson().fromJson(pluginDescriptionJsonObject.toString(), PluginDescription.class);

@@ -3,17 +3,11 @@ package de.treona.shelfs.api.plugin;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
 import java.util.List;
 
-/**
- * Version 1.0
- */
-@SuppressWarnings("FieldCanBeLocal")
-public class PluginDescription implements Serializable {
+@SuppressWarnings({"unused", "WeakerAccess"})
+public class PluginDescription {
 
-
-    private final static long serialVersionUID = -6314408650344698744L;
     /**
      * The Author Schema
      * <p>
@@ -53,6 +47,9 @@ public class PluginDescription implements Serializable {
     @SerializedName("dependencies")
     @Expose
     private List<String> dependencies = null;
+    @SerializedName("nativeLibraries")
+    @Expose
+    private List<String> nativeLibraries = null;
 
     /**
      * The Author Schema
@@ -63,6 +60,7 @@ public class PluginDescription implements Serializable {
     public String getAuthor() {
         return author;
     }
+
 
     /**
      * The Name Schema
@@ -98,4 +96,7 @@ public class PluginDescription implements Serializable {
         return dependencies;
     }
 
+    public List<String> getNativeLibraries() {
+        return nativeLibraries;
+    }
 }
