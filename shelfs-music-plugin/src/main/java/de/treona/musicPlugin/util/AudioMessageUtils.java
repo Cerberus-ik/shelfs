@@ -117,7 +117,7 @@ public class AudioMessageUtils {
         if (position == 1)
             stringBuilder.append("Next song:").append("``").append("  ");
         else
-            stringBuilder.append(position).append(") ``");
+            stringBuilder.append(position).append(")``").append(" ");
         if (track.getInfo().title.length() + track.getInfo().author.length() > 55) {
             stringBuilder.append(track.getInfo().author)
                     .append(" – ").append(track.getInfo().title, 0, 52 - track.getInfo().author.length()).append("...")
@@ -152,6 +152,13 @@ public class AudioMessageUtils {
         int start = 10 * site - 10;
         StringBuilder stringBuilder = new StringBuilder();
         List<AudioTrack> tracks = new ArrayList<>(queue.keySet());
+        tracks.sort((track1, track2) -> {
+            if (queue.get(track1) && !queue.get(track2))
+                return 1;
+            else if (!queue.get(track1) && queue.get(track2))
+                return -1;
+            return 0;
+        });
         for (int i = start; i < Math.min(queue.size(), start + 10); i++) {
             AudioTrack track = tracks.get(i);
             String trackDuration = "∞";

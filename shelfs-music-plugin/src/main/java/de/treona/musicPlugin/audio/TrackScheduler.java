@@ -11,6 +11,7 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.Thread.sleep;
 
@@ -40,8 +41,8 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public void queue(AudioTrack track, boolean autoPlaylist) {
-        if (!player.startTrack(track, true)) {
-            queue.put(track, autoPlaylist);
+        if (!this.player.startTrack(track, true)) {
+            this.queue.put(track, autoPlaylist);
         }
     }
 
@@ -148,6 +149,11 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @SuppressWarnings("WeakerAccess")
     public int getPositionOfTrack(AudioTrack track) {
-        return new ArrayList<>(new LinkedHashMap<>(this.queue).keySet()).indexOf(track);
+        if (this.queue.get(track) == null)
+            return 0;
+        else if (this.queue.get(track))
+            return new ArrayList<>(new LinkedHashMap<>(this.queue).keySet()).indexOf(track);
+        else
+            return this.queue.keySet().stream().filter(streamTrack -> !this.queue.get(streamTrack)).collect(Collectors.toList()).indexOf(track);
     }
 }
