@@ -25,11 +25,14 @@ public class Main {
                 }
             });
         }
+        System.out.println("Writing plugin information...");
+        jarFileBuilder.writePluginDescriptions();
         System.out.println("Packaging Shelfs v" + Shelfs.getVersion() + "...");
         jarFileBuilder.addJar(new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()));
         jarFileBuilder.close();
         System.out.println("Launching Shelfs...");
         Process process = Runtime.getRuntime().exec("java -jar bot.jar -builder");
+        Runtime.getRuntime().addShutdownHook(new Thread(process::destroy));
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line;
         while ((line = bufferedReader.readLine()) != null) {

@@ -2,8 +2,9 @@ package de.treona.shelfs.api.plugin;
 
 import de.treona.shelfs.api.Shelfs;
 import de.treona.shelfs.io.logger.LogLevel;
+import de.treona.shelfs.io.resource.ResourceLoader;
+import org.json.JSONArray;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,12 +19,12 @@ public class PluginManager {
         this.plugins = new HashMap<>();
     }
 
-    public void loadPlugins(String pluginDirectory) {
+    public void loadPlugins() {
         PluginLoader pluginLoader = new PluginLoader();
-        pluginLoader.loadPlugins(new File(pluginDirectory)).forEach(this::loadPlugin);
+        pluginLoader.loadPlugins(new JSONArray(new ResourceLoader().getResourceFileContent("plugins.json"))).forEach(this::enablePlugin);
     }
 
-    public void loadPlugin(ShelfsPlugin shelfsPlugin) {
+    public void enablePlugin(ShelfsPlugin shelfsPlugin) {
         if (this.plugins.containsKey(shelfsPlugin)) {
             throw new IllegalStateException("Plugin is already loaded.");
         }
@@ -32,7 +33,7 @@ public class PluginManager {
         shelfsPlugin.onEnable();
     }
 
-    public void unloadPlugin(ShelfsPlugin shelfsPlugin) {
+    public void disablePlugin(ShelfsPlugin shelfsPlugin) {
         if (!this.plugins.containsKey(shelfsPlugin)) {
             throw new IllegalStateException("Plugin is not loaded.");
         }
@@ -40,11 +41,11 @@ public class PluginManager {
         Shelfs.getCommandManager().unregisterCommand(shelfsPlugin);
     }
 
-    public List<ShelfsPlugin> getLoadedPlugins() {
+    public List<ShelfsPlugin> getEnabledPlugins() {
         return this.plugins.keySet().stream().filter(plugin -> this.plugins.get(plugin)).collect(Collectors.toList());
     }
 
-    public List<ShelfsPlugin> getUnloadedPlugins() {
+    public List<ShelfsPlugin> getDisabledPlugins() {
         return this.plugins.keySet().stream().filter(plugin -> !this.plugins.get(plugin)).collect(Collectors.toList());
     }
 
@@ -52,7 +53,7 @@ public class PluginManager {
         return new ArrayList<>(this.plugins.keySet());
     }
 
-    public boolean isPluginLoaded(ShelfsPlugin plugin) {
+    public boolean isPluginEnabled(ShelfsPlugin plugin) {
         Boolean isLoaded = this.plugins.getOrDefault(plugin, null);
         if (isLoaded == null) {
             throw new IllegalStateException("Plugin does not exist.");

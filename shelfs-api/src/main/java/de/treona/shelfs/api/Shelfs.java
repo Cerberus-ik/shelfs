@@ -51,7 +51,7 @@ public final class Shelfs {
 
     private static void loadPlugins() {
         logger.logMessage("Loading plugins...", LogLevel.INFO);
-        pluginManager.loadPlugins(configManager.getConfig().pluginDirectory);
+        pluginManager.loadPlugins();
     }
 
     public static void start() {

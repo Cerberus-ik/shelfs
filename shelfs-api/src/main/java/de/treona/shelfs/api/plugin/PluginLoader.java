@@ -9,6 +9,7 @@ import de.treona.shelfs.io.logger.Logger;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 
 public class PluginLoader {
 
-    private ShelfsPlugin loadPlugin(File file) {
+    private ShelfsPlugin loadPluginFromJar(File file) {
         if (file == null) {
             throw new NullPointerException("Plugin file can't be null.");
         }
@@ -73,6 +74,20 @@ public class PluginLoader {
         return null;
     }
 
+    private ShelfsPlugin loadPlugin(JSONObject pluginFile) {
+        try {
+            PluginDescription pluginDescription = new Gson().fromJson(pluginFile.toString(), PluginDescription.class);
+            Class<?> jarClass = Class.forName(pluginDescription.getMain());
+            Class<? extends ShelfsPlugin> pluginClass = jarClass.asSubclass(ShelfsPlugin.class);
+            ShelfsPlugin shelfsPlugin = pluginClass.getDeclaredConstructor().newInstance();
+            this.setPluginFields(shelfsPlugin, pluginDescription);
+            return shelfsPlugin;
+        } catch (InstantiationException | NoSuchMethodException | InvocationTargetException | ClassNotFoundException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private void setPluginFields(ShelfsPlugin shelfsPlugin, PluginDescription pluginDescription) {
         try {
             shelfsPlugin.getClass().getSuperclass().getField("pluginDescription").set(shelfsPlugin, pluginDescription);
@@ -82,13 +97,28 @@ public class PluginLoader {
         }
     }
 
+    List<ShelfsPlugin> loadPlugins(JSONArray pluginFiles) {
+        List<ShelfsPlugin> plugins = new ArrayList<>();
+        for (int i = 0; i < pluginFiles.length(); i++) {
+            ShelfsPlugin shelfsPlugin = loadPlugin(pluginFiles.getJSONObject(i));
+            plugins.add(shelfsPlugin);
+            if (shelfsPlugin == null)
+                continue;
+            Shelfs.getLogger().logMessage("Loaded: " + shelfsPlugin.getPluginDescription().getName() + " v" + shelfsPlugin.getPluginDescription().getVersion(), LogLevel.INFO);
+        }
+        plugins = plugins.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        return plugins;
+    }
+
     List<ShelfsPlugin> loadPlugins(File pluginDirectory) {
         final File[] files = pluginDirectory.listFiles(pathname -> pathname.getName().endsWith(".jar"));
         assert files != null;
         List<ShelfsPlugin> plugins = new ArrayList<>();
         for (File file : files) {
-            ShelfsPlugin shelfsPlugin = this.loadPlugin(file);
+            ShelfsPlugin shelfsPlugin = this.loadPluginFromJar(file);
             plugins.add(shelfsPlugin);
+            if (shelfsPlugin == null)
+                continue;
             Shelfs.getLogger().logMessage("Loaded: " + shelfsPlugin.getPluginDescription().getName() + " v" + shelfsPlugin.getPluginDescription().getVersion(), LogLevel.INFO);
         }
         plugins = plugins.stream().filter(Objects::nonNull).collect(Collectors.toList());
