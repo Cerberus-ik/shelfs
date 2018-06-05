@@ -42,7 +42,7 @@ public class LoadCommand implements GuildCommand, PrivateCommand {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Plugins found: ").append(plugins.size()).append(System.lineSeparator());
         plugins.forEach(plugin -> {
-            boolean isLoaded = Shelfs.getPluginManager().isPluginLoaded(plugin);
+            boolean isLoaded = Shelfs.getPluginManager().isPluginEnabled(plugin);
             if (isLoaded) {
                 stringBuilder.append(plugin.getPluginDescription().getName()).append(" is loaded").append(System.lineSeparator());
             } else {
@@ -50,7 +50,7 @@ public class LoadCommand implements GuildCommand, PrivateCommand {
             }
         });
         channel.sendMessage(stringBuilder.toString()).queue();
-        Shelfs.getPluginManager().getLoadedPlugins().forEach(plugins::remove);
+        Shelfs.getPluginManager().getEnabledPlugins().forEach(plugins::remove);
         if (plugins.size() == 0) {
             channel.sendMessage("No unloaded plugins found.").queue();
             return;
@@ -58,7 +58,7 @@ public class LoadCommand implements GuildCommand, PrivateCommand {
         StringBuilder finalStringBuilder = new StringBuilder();
         finalStringBuilder.append("Plugins loaded: ").append(plugins.size()).append(System.lineSeparator());
         plugins.forEach(plugin -> {
-            Shelfs.getPluginManager().loadPlugin(plugin);
+            Shelfs.getPluginManager().enablePlugin(plugin);
             finalStringBuilder.append("Loaded ").append(plugin.getPluginDescription().getName());
         });
         channel.sendMessage(finalStringBuilder.toString()).queue();

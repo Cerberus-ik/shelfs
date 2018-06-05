@@ -27,7 +27,7 @@ public class PluginsCommand implements GuildCommand, PrivateCommand {
         embedBuilder.setTitle("Shelfs");
         Shelfs.getPluginManager().getPlugins().forEach(plugin -> {
             String loaded;
-            if (Shelfs.getPluginManager().isPluginLoaded(plugin)) {
+            if (Shelfs.getPluginManager().isPluginEnabled(plugin)) {
                 loaded = "Loaded";
             } else {
                 loaded = "Unloaded";
