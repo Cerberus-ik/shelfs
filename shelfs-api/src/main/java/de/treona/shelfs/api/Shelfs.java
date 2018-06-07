@@ -7,6 +7,7 @@ import de.treona.shelfs.api.events.listener.ReactionMessageListener;
 import de.treona.shelfs.api.plugin.PluginManager;
 import de.treona.shelfs.api.plugin.ShelfsPlugin;
 import de.treona.shelfs.commands.CommandManager;
+import de.treona.shelfs.config.Config;
 import de.treona.shelfs.config.ConfigManager;
 import de.treona.shelfs.io.IOManager;
 import de.treona.shelfs.io.IOType;
@@ -84,7 +85,7 @@ public final class Shelfs {
     }
 
     public static String getVersion() {
-        return "0.5.1";
+        return "0.5.2";
     }
 
     public static JDA getJda() {
@@ -106,7 +107,11 @@ public final class Shelfs {
         return new File(configManager.getConfig().pluginDirectory + "/" + plugin.getPluginDescription().getName());
     }
 
-    public static JSONObject getConfig(ShelfsPlugin plugin) {
+    public static Config getConfig() {
+        return configManager.getConfig();
+    }
+
+    public static JSONObject getPluginConfig(ShelfsPlugin plugin) {
         File configFile = new File(getConfigDirectory(plugin) + "/config.json");
         if (!configFile.exists()) {
             return plugin.getDefaultConfig();

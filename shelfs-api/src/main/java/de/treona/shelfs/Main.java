@@ -2,41 +2,67 @@ package de.treona.shelfs;
 
 import de.treona.shelfs.api.Shelfs;
 import de.treona.shelfs.api.plugin.JarFileBuilder;
+import de.treona.shelfs.config.Config;
+import de.treona.shelfs.config.ConfigManager;
+import de.treona.shelfs.io.logger.LogLevel;
+import de.treona.shelfs.io.logger.Logger;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Objects;
 
 public class Main {
 
+    private static Config config;
+    private static Logger logger;
+
     public static void main(String[] args) throws IOException {
-        File pluginsDirectory = new File("plugins");
+        logger = new Logger();
+        ConfigManager configManager = new ConfigManager();
+        configManager.load();
+        config = configManager.getConfig();
+        if (config.dynamicLoad)
+            dynamicStart();
+        else {
+            //TODO add native libraries
+            logger.logMessage("Dynamic load isn't fully supported yet.", LogLevel.WARNING);
+            staticStart();
+        }
+    }
+
+    private static void dynamicStart() {
+        ShelfsLoader.start();
+    }
+
+    private static void staticStart() throws IOException {
         JarFileBuilder jarFileBuilder = new JarFileBuilder();
-        if (pluginsDirectory.exists()) {
-            Arrays.stream(Objects.requireNonNull(pluginsDirectory.listFiles())).filter(file -> file.getName().endsWith(".jar")).forEach(file -> {
+        packagePlugins(new File(config.pluginDirectory), jarFileBuilder);
+        logger.logMessage("Packaging Shelfs v" + Shelfs.getVersion() + "...", LogLevel.INFO);
+        jarFileBuilder.addJar(new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()));
+        jarFileBuilder.close();
+
+        logger.logMessage("Launching Shelfs...", LogLevel.INFO);
+        new ProcessBuilder().command("java", "-jar", "bot.jar", "-builder").inheritIO().start();
+        //Runtime.getRuntime().addShutdownHook(new Thread(process::destroy));
+        /*BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line;
+        while ((line = bufferedReader.readLine()) != null)
+            System.out.println(line);*/
+    }
+
+    private static void packagePlugins(File pluginDirectory, JarFileBuilder jarFileBuilder) throws IOException {
+        if (pluginDirectory.exists()) {
+            Arrays.stream(Objects.requireNonNull(pluginDirectory.listFiles())).filter(file -> file.getName().endsWith(".jar")).forEach(file -> {
                 try {
                     jarFileBuilder.addJar(file);
-                    System.out.println("Packaging " + file.getName() + "...");
+                    logger.logMessage("Packaging " + file.getName() + "...", LogLevel.INFO);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             });
         }
-        System.out.println("Writing plugin information...");
+        logger.logMessage("Writing plugin information...", LogLevel.INFO);
         jarFileBuilder.writePluginDescriptions();
-        System.out.println("Packaging Shelfs v" + Shelfs.getVersion() + "...");
-        jarFileBuilder.addJar(new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()));
-        jarFileBuilder.close();
-        System.out.println("Launching Shelfs...");
-        Process process = Runtime.getRuntime().exec("java -jar bot.jar -builder");
-        Runtime.getRuntime().addShutdownHook(new Thread(process::destroy));
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String line;
-        while ((line = bufferedReader.readLine()) != null) {
-            System.out.println(line);
-        }
     }
 }

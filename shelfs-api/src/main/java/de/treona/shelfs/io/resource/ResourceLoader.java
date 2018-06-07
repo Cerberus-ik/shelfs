@@ -9,6 +9,7 @@ import java.net.URL;
 /**
  * Simple class for accessing resource files.
  */
+@SuppressWarnings("unused")
 public class ResourceLoader {
 
     private Class aClass;
@@ -61,7 +62,7 @@ public class ResourceLoader {
     /**
      * Will return the input stream of the given file path.
      *
-     * @param path path to the file in the resource directory.
+     * @param path to the file in the resource directory.
      * @return the input stream of the File.
      */
     public InputStream getResourceFileInputStream(String path) {
@@ -69,4 +70,18 @@ public class ResourceLoader {
         return classLoader.getResourceAsStream(path);
     }
 
+    /**
+     * Will check if the given resource exists/is accessible.
+     *
+     * @param path to the file.
+     * @return true if the file exists and false if not or is not accessible.
+     */
+    public boolean doesResourceExist(String path) {
+        try {
+            URL url = this.aClass.getClassLoader().getResource(path);
+            return url != null;
+        } catch (Exception ignore) {
+            return false;
+        }
+    }
 }

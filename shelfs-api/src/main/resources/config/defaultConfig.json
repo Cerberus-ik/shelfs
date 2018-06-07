@@ -1,4 +1,5 @@
 {
+  "dynamicLoad": false,
   "currentGame": "Shelfs",
   "onlineStatus": "Online",
   "pluginDirectory": "plugins",

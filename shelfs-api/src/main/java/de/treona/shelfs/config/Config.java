@@ -14,4 +14,5 @@ public class Config {
     public String commandPrefix;
     public IOType ioType;
     public DatabaseCredentials databaseCredentials;
+    public boolean dynamicLoad;
 }

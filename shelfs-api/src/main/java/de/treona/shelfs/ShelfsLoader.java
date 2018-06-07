@@ -1,21 +1,26 @@
 package de.treona.shelfs;
 
 import de.treona.shelfs.api.Shelfs;
+import de.treona.shelfs.io.logger.LogLevel;
+import de.treona.shelfs.io.logger.Logger;
 
 import java.util.Arrays;
 
 public class ShelfsLoader {
 
     public static void main(String[] args) {
-        if (Arrays.stream(args).anyMatch(arg -> arg.equals("-builder"))) {
-            Shelfs.loadConfig();
-            Shelfs.start();
-        } else if (Arrays.stream(args).anyMatch(arg -> arg.equals("-bypass"))) {
-            System.out.println("You are bypassing the build process, this might cause issues!");
-            Shelfs.loadConfig();
-            Shelfs.start();
+        Logger logger = new Logger("ShelfsLoader");
+        if (Arrays.stream(args).anyMatch(arg -> arg.equals("-builder")))
+            start();
+        else if (Arrays.stream(args).anyMatch(arg -> arg.equals("-bypass"))) {
+            logger.logMessage("You are bypassing the build process, this might cause issues!", LogLevel.WARNING);
+            start();
         } else
-            System.out.println("Please launch the bot with over the shelfs bot builder.");
+            logger.logMessage("Please launch the bot over the shelfs bot builder.", LogLevel.INFO);
+    }
 
+    static void start() {
+        Shelfs.loadConfig();
+        Shelfs.start();
     }
 }

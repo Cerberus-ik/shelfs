@@ -3,11 +3,17 @@
   "type": "object",
   "definitions": {},
   "$schema": "http://json-schema.org/draft-07/schema#",
+  "dynamicLoad": {
+    "$id": "/properties/dynamicLoad",
+    "type": "boolean",
+    "title": "The dynamic load Schema ",
+    "default": "false"
+  },
   "properties": {
     "currentGame": {
       "$id": "/properties/currentGame",
       "type": "string",
-      "title": "The Currentgame Schema ",
+      "title": "The current game Schema ",
       "default": "",
       "examples": [
         "Shelfs"
@@ -16,7 +22,7 @@
     "onlineStatus": {
       "$id": "/properties/onlineStatus",
       "type": "string",
-      "title": "The Onlinestatus Schema ",
+      "title": "The Online status Schema ",
       "default": "",
       "examples": [
         "Online"
@@ -34,7 +40,7 @@
     "pluginDirectory": {
       "$id": "/properties/pluginDirectory",
       "type": "string",
-      "title": "The Plugindirectory Schema ",
+      "title": "The Plugin directory Schema ",
       "default": "",
       "examples": [
         "plugins"
@@ -76,7 +82,7 @@
         "ioPassword": {
           "$id": "/properties/database/properties/ioPassword",
           "type": "string",
-          "title": "The Iopassword Schema ",
+          "title": "The IOPassword Schema ",
           "default": "",
           "examples": [
             "a safe password"
@@ -85,7 +91,7 @@
         "ioUser": {
           "$id": "/properties/database/properties/ioUser",
           "type": "string",
-          "title": "The Iouser Schema ",
+          "title": "The IOUser Schema ",
           "default": "user",
           "examples": [
             "user"
@@ -94,7 +100,7 @@
         "ioDb": {
           "$id": "/properties/database/properties/ioDb",
           "type": "string",
-          "title": "The Iodb Schema ",
+          "title": "The IODb Schema ",
           "default": "shelfs",
           "examples": [
             "shelfs",
@@ -104,7 +110,7 @@
         "ioHost": {
           "$id": "/properties/database/properties/ioHost",
           "type": "string",
-          "title": "The Iohost Schema ",
+          "title": "The IOHost Schema ",
           "default": "host",
           "examples": [
             "123.123.123.123",
@@ -114,7 +120,7 @@
         "ioPort": {
           "$id": "/properties/database/properties/ioPort",
           "type": "string",
-          "title": "The Ioport Schema ",
+          "title": "The IOPort Schema ",
           "default": "3306",
           "examples": [
             "3306"

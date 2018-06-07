@@ -1,32 +1,45 @@
 package de.treona.shelfs.io.logger;
 
 import de.treona.shelfs.api.plugin.ShelfsPlugin;
+import org.slf4j.LoggerFactory;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
+@SuppressWarnings("WeakerAccess")
 public class Logger {
 
-    private String pluginName;
+    private org.slf4j.Logger logger;
+
+    public Logger(String moduleName) {
+        this.logger = LoggerFactory.getLogger(moduleName);
+    }
 
     public Logger(ShelfsPlugin plugin) {
-        this.pluginName = plugin.getPluginDescription().getName();
+        this(plugin.getPluginDescription().getName());
     }
 
     public Logger() {
-        this.pluginName = "Shelfs";
+        this("Shelfs");
     }
 
     public void logMessage(String message) {
-        logMessage(message, LogLevel.UNKNOWN);
+        this.logger.info("Unknown: " + message);
     }
 
     public void logMessage(String message, LogLevel logLevel) {
-        System.out.println(getMessagePrefix() + " [" + logLevel.getName() + "] [" + this.pluginName + "]: " + message);
-    }
-
-    private String getMessagePrefix() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("[HH:mm:ss]");
-        return simpleDateFormat.format(new Date());
+        switch (logLevel) {
+            case INFO:
+                this.logger.info(message);
+                break;
+            case ERROR:
+                this.logger.error(message);
+            case UNKNOWN:
+                this.logMessage(message);
+                break;
+            case WARNING:
+                this.logger.warn(message);
+                break;
+            default:
+                this.logMessage(message);
+        }
+        //System.out.println(getMessagePrefix() + " [" + logLevel.getName() + "] [" + this.moduleName + "]: " + message);
     }
 }

@@ -5,6 +5,7 @@ import de.treona.shelfs.io.logger.LogLevel;
 import de.treona.shelfs.io.resource.ResourceLoader;
 import org.json.JSONArray;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +22,11 @@ public class PluginManager {
 
     public void loadPlugins() {
         PluginLoader pluginLoader = new PluginLoader();
-        pluginLoader.loadPlugins(new JSONArray(new ResourceLoader().getResourceFileContent("plugins.json"))).forEach(this::enablePlugin);
+        ResourceLoader resourceLoader = new ResourceLoader(this.getClass());
+        if (resourceLoader.doesResourceExist("plugins.json"))
+            pluginLoader.loadPlugins(new JSONArray(resourceLoader.getResourceFileContent("plugins.json"))).forEach(this::enablePlugin);
+        else
+            pluginLoader.loadPlugins(new File(Shelfs.getConfig().pluginDirectory)).forEach(this::enablePlugin);
     }
 
     public void enablePlugin(ShelfsPlugin shelfsPlugin) {

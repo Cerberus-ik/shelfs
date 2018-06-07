@@ -37,13 +37,14 @@ public class ConfigManager {
         }
         this.config = new Config();
         try {
-            config.getClass().getDeclaredField("databaseCredentials").set(config, this.loadDatabaseCredentials(jsonObject.getJSONObject("database")));
-            config.getClass().getDeclaredField("pluginDirectory").set(config, jsonObject.getString("pluginDirectory"));
-            config.getClass().getDeclaredField("token").set(config, jsonObject.getString("token"));
-            config.getClass().getDeclaredField("commandPrefix").set(config, jsonObject.getString("commandPrefix"));
-            config.getClass().getDeclaredField("currentGame").set(config, jsonObject.getString("currentGame"));
-            config.getClass().getDeclaredField("onlineStatus").set(config, OnlineStatus.fromKey(jsonObject.getString("onlineStatus")));
-            config.getClass().getDeclaredField("ioType").set(config, IOType.getTypeByName(jsonObject.getString("io")));
+            this.config.getClass().getDeclaredField("databaseCredentials").set(config, this.loadDatabaseCredentials(jsonObject.getJSONObject("database")));
+            this.config.getClass().getDeclaredField("dynamicLoad").set(config, jsonObject.getBoolean("dynamicLoad"));
+            this.config.getClass().getDeclaredField("pluginDirectory").set(config, jsonObject.getString("pluginDirectory"));
+            this.config.getClass().getDeclaredField("token").set(config, jsonObject.getString("token"));
+            this.config.getClass().getDeclaredField("commandPrefix").set(config, jsonObject.getString("commandPrefix"));
+            this.config.getClass().getDeclaredField("currentGame").set(config, jsonObject.getString("currentGame"));
+            this.config.getClass().getDeclaredField("onlineStatus").set(config, OnlineStatus.fromKey(jsonObject.getString("onlineStatus")));
+            this.config.getClass().getDeclaredField("ioType").set(config, IOType.getTypeByName(jsonObject.getString("io")));
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (NoSuchFieldException e) {
@@ -131,7 +132,7 @@ public class ConfigManager {
     }
 
     private boolean isConfigValid(JSONObject jsonObject) {
-        try (InputStream inputStream = getClass().getResourceAsStream("/schemas/configSchema-1.0.json")) {
+        try (InputStream inputStream = getClass().getResourceAsStream("/schemas/configSchema-1.1.json")) {
             JSONObject rawSchema = new JSONObject(new JSONTokener(inputStream));
             Schema schema = SchemaLoader.load(rawSchema);
             schema.validate(jsonObject);

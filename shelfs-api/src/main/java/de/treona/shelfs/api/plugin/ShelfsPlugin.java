@@ -42,7 +42,7 @@ public class ShelfsPlugin {
     }
 
     public JSONObject getConfig() {
-        return Shelfs.getConfig(this);
+        return Shelfs.getPluginConfig(this);
     }
 
     public void saveConfig(JSONObject config) {
