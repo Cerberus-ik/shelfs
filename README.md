@@ -21,7 +21,7 @@ steal your discord bot token. <br>
 
 #### Plugin requirements:
 - A class that extends ``ShelfsPlugin``
-- A ``plugin.json`` in the very top of your plugin <br>
+- A ``plugin.json`` on the very top of your plugin <br>
 Everything else is optional <br>
 #### plugin.json
 The ``plugin.json`` contains the information Shelfs needs to load your plugin. **It is required!** <br>
@@ -61,8 +61,12 @@ Since 0.4.0 Shelfs has it's own events. If you want to listen to them you need a
 It not only gives you access to the Shelf events but although every JDA event. It is recommended to use this Adapter instead 
 of the default one.
 
-### Road map
-- Custom plugin var support
+
+### Static vs Dynamic load
+Shelfs supports two options of running your bot. ``Static load`` is the default option running shelfs
+will generate a bot.jar that get's executed automatically. If you want to avoid writing to your disk at
+every startup you can enable ``Dynamic load``. This option loads all plugins at startup without writing 
+extra files to the disk. This option **can** cause issues if your plugin requires extra resource files.
 
 ### Dependencies
 - kotlin runtime

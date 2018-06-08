@@ -43,8 +43,10 @@ public class ReactionMessageUtil extends ShelfsListenerAdapter {
             }
             reactionMessage.afterSend();
             messages.put(message.getId(), reactionMessage);
-            if (messages.size() > 10000)
-                messages.remove(messages.keySet().iterator().next());
+            if (messages.size() > 10000) {
+                String messageToRemove = messages.keySet().iterator().next();
+                messages.remove(messageToRemove);
+            }
         }).start();
     }
 

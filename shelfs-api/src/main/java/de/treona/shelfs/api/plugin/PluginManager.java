@@ -31,7 +31,7 @@ public class PluginManager {
 
     public void enablePlugin(ShelfsPlugin shelfsPlugin) {
         if (this.plugins.containsKey(shelfsPlugin)) {
-            throw new IllegalStateException("Plugin is already loaded.");
+            throw new IllegalStateException("Plugin is already enabled.");
         }
         this.plugins.put(shelfsPlugin, true);
         Shelfs.getLogger().logMessage("Enabling " + shelfsPlugin.getPluginDescription().getName() + "...", LogLevel.INFO);
@@ -40,10 +40,12 @@ public class PluginManager {
 
     public void disablePlugin(ShelfsPlugin shelfsPlugin) {
         if (!this.plugins.containsKey(shelfsPlugin)) {
-            throw new IllegalStateException("Plugin is not loaded.");
+            throw new IllegalStateException("Plugin is not enabled.");
         }
         this.plugins.put(shelfsPlugin, false);
+        Shelfs.getLogger().logMessage("Disabling " + shelfsPlugin.getPluginDescription().getName() + "...", LogLevel.INFO);
         Shelfs.getCommandManager().unregisterCommand(shelfsPlugin);
+        shelfsPlugin.onDisable();
     }
 
     public List<ShelfsPlugin> getEnabledPlugins() {

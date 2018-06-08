@@ -2,7 +2,6 @@ package de.treona.shelfs.api.plugin;
 
 import de.treona.shelfs.api.Shelfs;
 import de.treona.shelfs.io.logger.Logger;
-import de.treona.shelfs.io.resource.ResourceLoader;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -12,6 +11,7 @@ public class ShelfsPlugin {
 
     public Logger logger;
     public PluginDescription pluginDescription;
+    public JSONObject defaultConfig;
 
     public ShelfsPlugin() {
         this.logger = null;
@@ -37,8 +37,7 @@ public class ShelfsPlugin {
     }
 
     public JSONObject getDefaultConfig() {
-        ResourceLoader resourceLoader = new ResourceLoader(this.getClass());
-        return new JSONObject(resourceLoader.getResourceFileContent("config.json"));
+        return this.defaultConfig;
     }
 
     public JSONObject getConfig() {

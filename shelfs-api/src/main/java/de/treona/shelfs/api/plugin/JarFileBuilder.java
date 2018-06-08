@@ -1,12 +1,18 @@
 package de.treona.shelfs.api.plugin;
 
+import de.treona.shelfs.io.logger.LogLevel;
+import de.treona.shelfs.io.logger.Logger;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.jar.*;
 
@@ -16,46 +22,71 @@ public class JarFileBuilder {
     private JarOutputStream jarOutputStream;
     private List<String> directories;
     private List<String> classes;
-    private List<JSONObject> pluginDescriptions;
+    private HashMap<String, JSONObject> defaultConfigs;
+    private HashMap<File, JSONObject> pluginDescriptions;
+    private Logger logger;
 
     public JarFileBuilder() {
         try {
+            this.logger = new Logger("JarFileBuilder");
             this.classes = new ArrayList<>();
             this.directories = new ArrayList<>();
-            this.pluginDescriptions = new ArrayList<>();
+            this.pluginDescriptions = new HashMap<>();
+            this.defaultConfigs = new HashMap<>();
             this.jarOutputStream = new JarOutputStream(new FileOutputStream("bot.jar"), this.buildManifest());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void addJar(File source) throws IOException {
-        JarFile jar = new JarFile(source);
-        byte[] buffer = new byte[1024];
-        int bytesRead;
-        for (Enumeration entries = jar.entries(); entries.hasMoreElements(); ) {
-            JarEntry entry = (JarEntry) entries.nextElement();
-            if (entry.getName().contains("META-INF"))
-                continue;
-            else if (entry.getName().equalsIgnoreCase("plugin.json")) {
-                this.pluginDescriptions.add(this.getPluginDescriptionsFromEntry(jar, entry));
-                continue;
-            } else if (entry.isDirectory() && this.directories.contains(entry.getName()))
-                continue;
-            else if (entry.isDirectory())
-                this.directories.add(entry.getName());
-            if (!entry.isDirectory() && this.classes.contains(entry.getName()))
-                continue;
-            else if (!entry.isDirectory())
-                this.classes.add(entry.getName());
-            InputStream entryStream = jar.getInputStream(entry);
-            this.jarOutputStream.putNextEntry(entry);
-            while ((bytesRead = entryStream.read(buffer)) != -1) {
-                this.jarOutputStream.write(buffer, 0, bytesRead);
+    public void addJar(File source, boolean isPlugin) {
+        try (JarFile jar = new JarFile(source)) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            for (Enumeration entries = jar.entries(); entries.hasMoreElements(); ) {
+                JarEntry entry = (JarEntry) entries.nextElement();
+                if (entry.getName().contains("META-INF"))
+                    continue;
+                else if (entry.getName().equalsIgnoreCase("plugin.json")) {
+                    this.pluginDescriptions.put(source, this.getJSONObjectFromJar(jar, entry));
+                    continue;
+                } else if (entry.getName().equalsIgnoreCase("config.json")) {
+                    continue;
+                } else if (entry.isDirectory() && this.directories.contains(entry.getName()))
+                    continue;
+                else if (entry.isDirectory())
+                    this.directories.add(entry.getName());
+                if (!entry.isDirectory() && this.classes.contains(entry.getName()))
+                    continue;
+                else if (!entry.isDirectory())
+                    this.classes.add(entry.getName());
+                try (InputStream entryStream = jar.getInputStream(entry)) {
+                    this.jarOutputStream.putNextEntry(entry);
+                    while ((bytesRead = entryStream.read(buffer)) != -1)
+                        this.jarOutputStream.write(buffer, 0, bytesRead);
+                }
             }
-            entryStream.close();
+            if (isPlugin && !this.pluginDescriptions.containsKey(source))
+                this.logger.logMessage(source.getName() + " does not contain a plugin.json.", LogLevel.WARNING);
+            else if (isPlugin && this.pluginDescriptions.containsKey(source))
+                this.addDefaultConfig(source);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        jar.close();
+    }
+
+    private void addDefaultConfig(File source) {
+        try (JarFile jar = new JarFile(source)) {
+            for (Enumeration entries = jar.entries(); entries.hasMoreElements(); ) {
+                JarEntry entry = (JarEntry) entries.nextElement();
+                if (!entry.getName().equalsIgnoreCase("config.json"))
+                    continue;
+                this.defaultConfigs.put(this.pluginDescriptions.get(source).getString("name"), this.getJSONObjectFromJar(jar, entry));
+                return;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private Manifest buildManifest() {
@@ -65,26 +96,31 @@ public class JarFileBuilder {
         return manifest;
     }
 
-    private JSONObject getPluginDescriptionsFromEntry(JarFile jarFile, JarEntry jarEntry) {
+    private JSONObject getJSONObjectFromJar(JarFile jarFile, JarEntry jarEntry) {
         try (InputStream entryStream = jarFile.getInputStream(jarEntry)) {
             return new JSONObject(IOUtils.toString(entryStream, "UTF-8"));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new JSONObject("{\"error\": \"Could not read the plugin description\"}");
+        return new JSONObject("{\"error\": \"Could not read " + jarEntry.getName() + "\"}");
+    }
+
+    public void writeDefaultConfigs() throws IOException {
+        JSONObject jsonObject = new JSONObject();
+        this.defaultConfigs.forEach(jsonObject::put);
+        this.writeJarEntry("configs.json", jsonObject.toString());
     }
 
     public void writePluginDescriptions() throws IOException {
-        JarEntry jarEntry = new JarEntry("plugins.json");
-        this.jarOutputStream.putNextEntry(jarEntry);
-        byte[] buffer = new byte[1024];
-        int bytesRead;
         JSONArray jsonArray = new JSONArray();
-        this.pluginDescriptions.forEach(jsonArray::put);
-        InputStream entryStream = new ByteArrayInputStream(jsonArray.toString().getBytes());
-        while ((bytesRead = entryStream.read(buffer)) != -1) {
-            this.jarOutputStream.write(buffer, 0, bytesRead);
-        }
+        this.pluginDescriptions.forEach((key, value) -> jsonArray.put(value));
+        this.writeJarEntry("plugins.json", jsonArray.toString());
+    }
+
+    private void writeJarEntry(String entryName, String content) throws IOException {
+        JarEntry jarEntry = new JarEntry(entryName);
+        this.jarOutputStream.putNextEntry(jarEntry);
+        IOUtils.write(content.getBytes(), this.jarOutputStream);
     }
 
     public void close() {

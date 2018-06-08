@@ -1,0 +1,22 @@
+Api
+- finish command events
+- add load order
+- add plugin var
+
+Music
+- make more accessible
+- add check for dynamic libraries
+
+DONE
+- Add multiple configs for dynamic load
+- auto remove for ReactionMessages
+- rework logger
+- Add plugin directory for fixed build
+- Add dynamic plugin load
+- Fix auto playlist load message
+- leave after stop
+- rewrite the plugin load procedure
+- Auto playlist secondary
+- Search for songs
+- custom Permissions
+- emoji react events

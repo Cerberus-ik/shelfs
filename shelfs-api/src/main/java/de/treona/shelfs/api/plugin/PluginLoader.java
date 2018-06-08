@@ -6,6 +6,8 @@ import de.treona.shelfs.api.exceptions.InvalidPluginDescriptionException;
 import de.treona.shelfs.api.exceptions.NoPluginDescriptionException;
 import de.treona.shelfs.io.logger.LogLevel;
 import de.treona.shelfs.io.logger.Logger;
+import de.treona.shelfs.io.resource.ResourceLoader;
+import org.apache.commons.io.IOUtils;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
@@ -14,7 +16,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -27,6 +32,13 @@ import java.util.stream.Collectors;
 
 public class PluginLoader {
 
+    private Logger logger;
+
+    public PluginLoader() {
+        this.logger = new Logger("PluginLoader");
+    }
+
+    //TODO rework this mess
     private ShelfsPlugin loadPluginFromJar(File file) {
         if (file == null) {
             throw new NullPointerException("Plugin file can't be null.");
@@ -34,6 +46,7 @@ public class PluginLoader {
         URLClassLoader classLoader = null;
         try {
             final PluginDescription pluginDescription = this.loadPluginDescription(file);
+            final JSONObject defaultConfig = this.loadDefaultConfig(file);
             JarFile jarFile = new JarFile(file);
             URL[] urls = {new URL("jar:file:" + file.getPath() + "!/")};
             classLoader = new URLClassLoader(urls);
@@ -56,7 +69,7 @@ public class PluginLoader {
             }
             if (shelfsPlugin == null)
                 throw new ClassNotFoundException();
-            this.setPluginFields(shelfsPlugin, pluginDescription);
+            this.setPluginFields(shelfsPlugin, pluginDescription, defaultConfig);
             return shelfsPlugin;
         } catch (InvalidPluginDescriptionException | IllegalAccessException | IOException | InstantiationException | NoSuchMethodException | InvocationTargetException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -80,7 +93,8 @@ public class PluginLoader {
             Class<?> jarClass = Class.forName(pluginDescription.getMain());
             Class<? extends ShelfsPlugin> pluginClass = jarClass.asSubclass(ShelfsPlugin.class);
             ShelfsPlugin shelfsPlugin = pluginClass.getDeclaredConstructor().newInstance();
-            this.setPluginFields(shelfsPlugin, pluginDescription);
+            ResourceLoader resourceLoader = new ResourceLoader();
+            this.setPluginFields(shelfsPlugin, pluginDescription, new JSONObject(resourceLoader.getResourceFileContent("configs.json")).getJSONObject(pluginDescription.getName()));
             return shelfsPlugin;
         } catch (InstantiationException | NoSuchMethodException | InvocationTargetException | ClassNotFoundException | IllegalAccessException e) {
             e.printStackTrace();
@@ -88,10 +102,11 @@ public class PluginLoader {
         return null;
     }
 
-    private void setPluginFields(ShelfsPlugin shelfsPlugin, PluginDescription pluginDescription) {
+    private void setPluginFields(ShelfsPlugin shelfsPlugin, PluginDescription pluginDescription, JSONObject defaultConfig) {
         try {
             shelfsPlugin.getClass().getSuperclass().getField("pluginDescription").set(shelfsPlugin, pluginDescription);
             shelfsPlugin.getClass().getSuperclass().getField("logger").set(shelfsPlugin, new Logger(shelfsPlugin));
+            shelfsPlugin.getClass().getSuperclass().getField("defaultConfig").set(shelfsPlugin, defaultConfig);
         } catch (IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
         }
@@ -125,46 +140,52 @@ public class PluginLoader {
         return plugins;
     }
 
-    private PluginDescription loadPluginDescription(File file) throws InvalidPluginDescriptionException, NoPluginDescriptionException {
-        JarFile jarFile = null;
-        InputStream inputStream = null;
-        PluginDescription pluginDescription;
+    private JSONObject loadDefaultConfig(File file) {
         try {
-            jarFile = new JarFile(file);
-            JarEntry jarEntry = jarFile.getJarEntry("plugin.json");
-            if (jarEntry == null) {
-                throw new InvalidPluginDescriptionException();
-            }
-            inputStream = jarFile.getInputStream(jarEntry);
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuilder stringBuilder = new StringBuilder();
-            bufferedReader.lines().forEach(stringBuilder::append);
-            JSONObject pluginDescriptionJsonObject = new JSONObject(stringBuilder.toString());
-            if (isPluginDescriptionInvalid(pluginDescriptionJsonObject)) {
-                throw new InvalidPluginDescriptionException();
-            }
-            pluginDescription = new Gson().fromJson(pluginDescriptionJsonObject.toString(), PluginDescription.class);
-        } catch (IOException e) {
-            throw new NoPluginDescriptionException();
+            String content = this.readFileFromJar(file, "config.json");
+            if (content == null)
+                return new JSONObject();
+            return new JSONObject(content);
+        } catch (FileNotFoundException e) {
+            return new JSONObject();
         } catch (JSONException e) {
-            throw new InvalidPluginDescriptionException();
-        } finally {
-            if (jarFile != null) {
-                try {
-                    jarFile.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            this.logger.logMessage("The default config from " + file.getName() + " is not valid json.", LogLevel.ERROR);
         }
-        return pluginDescription;
+        return new JSONObject();
+    }
+
+    private PluginDescription loadPluginDescription(File file) throws InvalidPluginDescriptionException, NoPluginDescriptionException {
+        JSONObject pluginDescriptionJsonObject;
+        try {
+            String content = this.readFileFromJar(file, "plugin.json");
+            if (content == null)
+                throw new NoPluginDescriptionException();
+            pluginDescriptionJsonObject = new JSONObject(content);
+        } catch (FileNotFoundException e) {
+            throw new NoPluginDescriptionException();
+        }
+        if (isPluginDescriptionInvalid(pluginDescriptionJsonObject)) {
+            throw new InvalidPluginDescriptionException();
+        }
+        return new Gson().fromJson(pluginDescriptionJsonObject.toString(), PluginDescription.class);
+    }
+
+    private String readFileFromJar(File file, String fileName) throws FileNotFoundException {
+        try (JarFile jarFile = new JarFile(file)) {
+            JarEntry jarEntry = jarFile.getJarEntry(fileName);
+            if (jarEntry == null) {
+                throw new FileNotFoundException("File " + fileName + " does not exist.");
+            }
+            StringBuilder stringBuilder = new StringBuilder();
+            IOUtils.readLines(jarFile.getInputStream(jarEntry), "UTF-8").forEach(stringBuilder::append);
+            return stringBuilder.toString();
+        } catch (IOException e) {
+            if (!(e instanceof FileNotFoundException))
+                e.printStackTrace();
+            else
+                throw (FileNotFoundException) e;
+        }
+        return null;
     }
 
     public boolean isPluginDescriptionInvalid(JSONObject jsonObject) {

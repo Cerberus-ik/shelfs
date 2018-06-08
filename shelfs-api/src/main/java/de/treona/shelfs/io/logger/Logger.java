@@ -31,15 +31,13 @@ public class Logger {
                 break;
             case ERROR:
                 this.logger.error(message);
+                break;
             case UNKNOWN:
                 this.logMessage(message);
                 break;
             case WARNING:
                 this.logger.warn(message);
                 break;
-            default:
-                this.logMessage(message);
         }
-        //System.out.println(getMessagePrefix() + " [" + logLevel.getName() + "] [" + this.moduleName + "]: " + message);
     }
 }

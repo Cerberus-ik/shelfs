@@ -77,7 +77,7 @@ public class CommandManager extends ShelfsListenerAdapter {
 
     public void unregisterCommand(ShelfsPlugin shelfsPlugin) {
         if (this.commands.keySet().stream().noneMatch(commandData -> commandData.plugin.equals(shelfsPlugin))) {
-            throw new IllegalStateException("Plugin is not registered.");
+            return;
         }
         List<CommandData> commandsToUnload = new ArrayList<>();
         this.commands.keySet().stream().filter(commandData -> commandData.plugin.equals(shelfsPlugin)).forEach(commandsToUnload::add);

@@ -22,13 +22,12 @@ public class Main {
         ConfigManager configManager = new ConfigManager();
         configManager.load();
         config = configManager.getConfig();
-        if (config.dynamicLoad)
-            dynamicStart();
-        else {
+        if (config.dynamicLoad) {
             //TODO add native libraries
             logger.logMessage("Dynamic load isn't fully supported yet.", LogLevel.WARNING);
+            dynamicStart();
+        } else
             staticStart();
-        }
     }
 
     private static void dynamicStart() {
@@ -39,7 +38,7 @@ public class Main {
         JarFileBuilder jarFileBuilder = new JarFileBuilder();
         packagePlugins(new File(config.pluginDirectory), jarFileBuilder);
         logger.logMessage("Packaging Shelfs v" + Shelfs.getVersion() + "...", LogLevel.INFO);
-        jarFileBuilder.addJar(new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()));
+        jarFileBuilder.addJar(new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()), false);
         jarFileBuilder.close();
 
         logger.logMessage("Launching Shelfs...", LogLevel.INFO);
@@ -54,15 +53,13 @@ public class Main {
     private static void packagePlugins(File pluginDirectory, JarFileBuilder jarFileBuilder) throws IOException {
         if (pluginDirectory.exists()) {
             Arrays.stream(Objects.requireNonNull(pluginDirectory.listFiles())).filter(file -> file.getName().endsWith(".jar")).forEach(file -> {
-                try {
-                    jarFileBuilder.addJar(file);
-                    logger.logMessage("Packaging " + file.getName() + "...", LogLevel.INFO);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                jarFileBuilder.addJar(file, true);
+                logger.logMessage("Packaging " + file.getName() + "...", LogLevel.INFO);
             });
         }
         logger.logMessage("Writing plugin information...", LogLevel.INFO);
         jarFileBuilder.writePluginDescriptions();
+        logger.logMessage("Writing default configs...", LogLevel.INFO);
+        jarFileBuilder.writeDefaultConfigs();
     }
 }
