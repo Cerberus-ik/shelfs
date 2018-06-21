@@ -5,9 +5,9 @@ Api
 
 Music
 - make more accessible
-- add check for dynamic libraries
 
 DONE
+- add check for dynamic libraries
 - Add multiple configs for dynamic load
 - auto remove for ReactionMessages
 - rework logger

@@ -12,12 +12,19 @@ import de.treona.musicPlugin.events.SearchListener;
 import de.treona.musicPlugin.permission.AudioPermissionUtil;
 import de.treona.shelfs.api.Shelfs;
 import de.treona.shelfs.api.plugin.ShelfsPlugin;
+import de.treona.shelfs.io.logger.LogLevel;
+import de.treona.shelfs.io.resource.ResourceLoader;
 import net.dv8tion.jda.core.entities.Game;
 
 public class Main extends ShelfsPlugin {
 
     @Override
     public void onEnable() {
+        if (!this.checkForNativeLibraries()) {
+            Shelfs.getPluginManager().disablePlugin(this);
+            return;
+        }
+
         Shelfs.getJda().getPresence().setGame(Game.of(Game.GameType.LISTENING, Shelfs.getCommandManager().getCommandPrefix() + "play song"));
         ConfigManager configManager = new ConfigManager(this);
         configManager.loadConfig();
@@ -45,5 +52,15 @@ public class Main extends ShelfsPlugin {
         Shelfs.getCommandManager().registerCommand(this, "replay", new ReplayCommand(audioController));
         Shelfs.getCommandManager().registerCommand(this, "shuffle", new ShuffleCommand(audioController));
         Shelfs.getCommandManager().registerCommand(this, "settings", new SettingsCommand(configManager, audioController));
+    }
+
+    private boolean checkForNativeLibraries() {
+        ResourceLoader resourceLoader = new ResourceLoader();
+        if (!resourceLoader.doesResourceExist("natives/win-x86/connector.dll")) {
+            super.getLogger().logMessage("Native libraries are missing!", LogLevel.ERROR);
+            super.getLogger().logMessage("Dynamic load can cause issues with native libraries.", LogLevel.ERROR);
+            return false;
+        }
+        return true;
     }
 }

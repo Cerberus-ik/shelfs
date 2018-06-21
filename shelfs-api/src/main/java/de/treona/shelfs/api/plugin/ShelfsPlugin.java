@@ -2,6 +2,7 @@ package de.treona.shelfs.api.plugin;
 
 import de.treona.shelfs.api.Shelfs;
 import de.treona.shelfs.io.logger.Logger;
+import de.treona.shelfs.io.resource.JSONBeautifier;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -49,6 +50,6 @@ public class ShelfsPlugin {
     }
 
     public void writeDefaultConfig() {
-        this.saveConfig(this.getDefaultConfig());
+        this.saveConfig(JSONBeautifier.beautifyJSONObjectToObject(this.getDefaultConfig()));
     }
 }

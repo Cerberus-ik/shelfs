@@ -1,5 +1,5 @@
 group 'Cerberus'
-version '1.0-SNAPSHOT'
+version 'v1.5.3'
 
 apply plugin: 'java'
 
@@ -11,12 +11,26 @@ repositories {
     jcenter()
 }
 
+configurations {
+    extraLibraries
+}
+
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile 'com.sedmelluq:lavaplayer:1.2.63'
-    compile('cerberus:shelfs-api:0.5.1')
+    extraLibraries 'com.sedmelluq:lavaplayer:1.2.63'
+    compile('cerberus:shelfs-api:0.5.2')
+    configurations.compile.extendsFrom(configurations.extraLibraries)
 }
 
 jar{
-    from configurations.compile.collect{ zipTree it}
+    println("Building Music plugin " + version + "...")
+    from {
+        configurations.extraLibraries.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
+
+task copyJar(type: Copy) {
+    from jar
+    into project.property("pathForSubBuilds") + "/plugins"
+}
+build.dependsOn copyJar

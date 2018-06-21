@@ -1,7 +1,9 @@
 rootProject.name = 'shelfs'
 include 'shelfs-api'
 include 'shelfs-test-plugin'
-include 'util-plugin'
 include 'shelfs-util-plugin'
 include 'shelfs-update-plugin'
+include 'shelfs-league-tools-plugin'
+include 'shelfs-music-plugin'
+include 'shelfs-base-plugin'
 

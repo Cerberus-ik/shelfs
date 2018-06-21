@@ -1,0 +1,9 @@
+{
+  "database": {
+    "ioPassword": "",
+    "ioUser": "",
+    "ioDb": "",
+    "ioHost": "",
+    "ioPort": "3306"
+  }
+}

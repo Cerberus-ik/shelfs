@@ -1,9 +1,7 @@
 apply plugin: 'maven-publish'
-group 'cerberus'
-version '0.5.2'
-
-apply plugin: 'maven-publish'
 apply plugin: 'java'
+group 'cerberus'
+version '0.5.3'
 
 sourceCompatibility = 1.8
 
@@ -21,9 +19,9 @@ dependencies {
     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.1.0'
     compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.9-rc'
     compile 'com.sedmelluq:jda-nas:1.0.5'
-
+    compile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
     /* Kotlin dependencies */
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.41"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.50"
     compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.22.5'
 }
 
@@ -47,6 +45,12 @@ jar{
     from configurations.compile.collect{ zipTree it}
     manifest.attributes "Main-Class": "de.treona.shelfs.Main"
 }
+
+task copyJar(type: Copy) {
+    from jar
+    into project.property("pathForSubBuilds")
+}
+build.dependsOn copyJar
 
 build.mustRunAfter clean
 build.finalizedBy(publishToMavenLocal)

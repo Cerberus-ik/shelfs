@@ -5,6 +5,7 @@ import de.treona.shelfs.api.exceptions.InvalidConfigException;
 import de.treona.shelfs.io.IOType;
 import de.treona.shelfs.io.database.DatabaseCredentials;
 import de.treona.shelfs.io.logger.LogLevel;
+import de.treona.shelfs.io.resource.JSONBeautifier;
 import de.treona.shelfs.io.resource.ResourceLoader;
 import net.dv8tion.jda.core.OnlineStatus;
 import org.everit.json.schema.Schema;
@@ -123,7 +124,7 @@ public class ConfigManager {
     private void writeDefaultConfig() {
         ResourceLoader resourceLoader = new ResourceLoader();
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(this.configFile))) {
-            bufferedWriter.write(resourceLoader.getResourceFileContent("config/defaultConfig.json"));
+            bufferedWriter.write(JSONBeautifier.beautifyJSONObject(new JSONObject(resourceLoader.getResourceFileContent("config/defaultConfig.json"))));
             bufferedWriter.flush();
         } catch (IOException e) {
             e.printStackTrace();

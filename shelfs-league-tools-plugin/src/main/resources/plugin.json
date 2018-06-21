@@ -1,0 +1,7 @@
+{
+  "author": "Cerberus",
+  "version": "0.1.0",
+  "name": "League-Tools",
+  "main": "de.treona.leagueTools.LeagueTools",
+  "pluginDescription": "Everything a league player could ever need"
+}
