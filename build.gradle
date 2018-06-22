@@ -5,10 +5,13 @@ apply plugin: 'java'
 sourceCompatibility = 1.8
 compileJava.options.encoding = 'UTF-8'
 
-repositories {
-    mavenCentral()
-    mavenLocal()
-    jcenter()
+allprojects {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+        maven { url 'https://jitpack.io' }
+    }
 }
 
 dependencies {

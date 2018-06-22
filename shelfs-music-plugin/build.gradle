@@ -4,6 +4,7 @@ version 'v1.5.3'
 apply plugin: 'java'
 
 sourceCompatibility = 1.8
+compileJava.options.encoding = 'UTF-8'
 
 repositories {
     mavenLocal()
