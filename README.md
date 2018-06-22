@@ -74,9 +74,7 @@ extra files to the disk. This option **can** cause issues if your plugin require
 - net.dv8tion:JDA
 - google-gson
 - logback
-- jcl-core ``Shelfs < 0.5``
 - junit
 - mysql-connector-java
-- lava-player (Plugin dependency)
 - jda-nas
  
