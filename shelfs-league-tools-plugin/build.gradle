@@ -19,15 +19,25 @@ repositories {
     mavenCentral()
     mavenLocal()
     jcenter()
+    maven { url 'https://jitpack.io' }
+}
+
+configurations {
+    extraLibraries
 }
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile group: 'cerberus', name: 'shelfs-api', version: '0.5.1'
+    compile group: 'cerberus', name: 'shelfs-api', version: '0.5.3'
+    extraLibraries 'com.github.stelar7:L4J8:V1.4.8'
+    configurations.compile.extendsFrom(configurations.extraLibraries)
 }
 
 jar{
     println("Building League-Tools plugin " + version + "...")
+    from {
+        configurations.extraLibraries.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
 
 task copyJar(type: Copy) {

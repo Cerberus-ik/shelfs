@@ -1,4 +1,6 @@
 {
+  "api-key": "",
+  "tournament-key": "",
   "database": {
     "ioPassword": "",
     "ioUser": "",
