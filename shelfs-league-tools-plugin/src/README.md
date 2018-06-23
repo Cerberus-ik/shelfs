@@ -3,4 +3,4 @@ Let's you link your league and discord account and provides you with information
 your current game/account and stats.
 
 ### Dependencies
-- Zyra
+- L4J8

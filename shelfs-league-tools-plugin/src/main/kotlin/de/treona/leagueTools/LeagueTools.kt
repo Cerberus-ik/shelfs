@@ -3,7 +3,9 @@ package de.treona.leagueTools
 import de.treona.leagueTools.account.AccountManager
 import de.treona.leagueTools.account.RegistrationManager
 import de.treona.leagueTools.commands.ConfirmCommand
+import de.treona.leagueTools.commands.MeCommand
 import de.treona.leagueTools.commands.RegisterCommand
+import de.treona.leagueTools.data.DataCacheManager
 import de.treona.leagueTools.io.ConfigReader
 import de.treona.leagueTools.io.DatabaseManager
 import de.treona.shelfs.api.Shelfs
@@ -17,16 +19,20 @@ class LeagueTools : ShelfsPlugin() {
     override fun onEnable() {
         if (config == null || config == defaultConfig)
             super.writeDefaultConfig()
-
         val api = L4J8(APICredentials(super.getConfig().getString("api-key"), super.getConfig().getString("tournament-key")))
+
         databaseManager.setup(ConfigReader.getDatabaseCredentials(super.getConfig().toString()))
+        dataCacheManager.start()
         Shelfs.getCommandManager().registerCommand(this, "register", RegisterCommand())
         Shelfs.getCommandManager().registerCommand(this, "confirm", ConfirmCommand())
+        Shelfs.getCommandManager().registerCommand(this, "me", MeCommand())
+        Shelfs.getCommandManager().registerCommand(this, "league", MeCommand())
     }
 
     companion object {
         val accountManager = AccountManager(Logger("Account-Manager"))
         val databaseManager = DatabaseManager(Logger("Database-Manager"))
         val registrationManager = RegistrationManager()
+        val dataCacheManager = DataCacheManager()
     }
 }

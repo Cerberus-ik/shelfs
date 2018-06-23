@@ -23,6 +23,10 @@ class AccountManager(var logger: Logger) {
         return Summoner.byName(summonerName, region) != null
     }
 
+    fun getDiscordSummoner(discordId: Long): DiscordSummoner {
+        return LeagueTools.databaseManager.getDiscordSummonerByDiscordId(discordId)!!
+    }
+
     fun upgrade(discordSummoner: DiscordSummoner): LoadedDiscordSummoner {
         return LoadedDiscordSummoner(discordSummoner.user, Summoner.bySummonerId(discordSummoner.summonerId, discordSummoner.region))
     }

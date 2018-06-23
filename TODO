@@ -2,6 +2,7 @@ Api
 - finish command events
 - add load order
 - add plugin var
+- IOUtils (sq-lite, etc)
 
 Music
 - make more accessible
