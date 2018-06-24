@@ -40,7 +40,11 @@ public class Main {
         logger.logMessage("Packaging Shelfs v" + Shelfs.getVersion() + "...", LogLevel.INFO);
         jarFileBuilder.addJar(new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()), false);
         jarFileBuilder.close();
-
+        File file = new File("bot.jar");
+        if (!file.setExecutable(true)) {
+            logger.logMessage("Could not make the bot.jar executable.", LogLevel.WARNING);
+            return;
+        }
         logger.logMessage("Launching Shelfs...", LogLevel.INFO);
         new ProcessBuilder().command("java", "-jar", "bot.jar", "-builder").inheritIO().start();
         //Runtime.getRuntime().addShutdownHook(new Thread(process::destroy));

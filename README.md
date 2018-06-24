@@ -9,6 +9,7 @@ Note that you don't have to install/use a single one of them.
 - Basic-Plugin
 - Util-Plugin
 - Update-Plugin (Kotlin)
+- League-Tools-Plugin (Kotlin)
 
 ### Plugin installation
 Just drag an drop any plugin jars you like in the plugins folder.

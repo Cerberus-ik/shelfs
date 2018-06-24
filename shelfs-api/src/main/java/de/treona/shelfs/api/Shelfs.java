@@ -85,7 +85,7 @@ public final class Shelfs {
     }
 
     public static String getVersion() {
-        return "0.5.3";
+        return "0.6.0";
     }
 
     public static JDA getJda() {
@@ -114,6 +114,7 @@ public final class Shelfs {
     public static JSONObject getPluginConfig(ShelfsPlugin plugin) {
         File configFile = new File(getConfigDirectory(plugin) + "/config.json");
         if (!configFile.exists()) {
+            saveConfig(plugin, plugin.defaultConfig);
             return plugin.getDefaultConfig();
         }
         try {
@@ -123,7 +124,8 @@ public final class Shelfs {
                 return new JSONObject(stringBuilder.toString());
             }
         } catch (IOException e) {
-            return null;
+            e.printStackTrace();
+            return new JSONObject();
         }
     }
 

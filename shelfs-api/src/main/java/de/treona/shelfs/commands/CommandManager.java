@@ -13,10 +13,11 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class CommandManager extends ShelfsListenerAdapter {
 
     private HashMap<CommandData, Command> commands;
@@ -58,14 +59,18 @@ public class CommandManager extends ShelfsListenerAdapter {
         return this.commands.get(this.getCommandDataFromCommand(command)).getPermission();
     }
 
-    public void registerCommand(ShelfsPlugin plugin, String trigger, Command command) {
+    public void registerCommand(ShelfsPlugin plugin, String trigger, Command command, String... aliases) {
         if (this.commands.values().contains(command)) {
             throw new IllegalStateException("Command is already registered.");
         }
         if (this.commands.keySet().stream().anyMatch(commandData -> commandData.trigger.equals(trigger))) {
             throw new IllegalStateException("Trigger is already registered.");
         }
-        this.commands.put(new CommandData(plugin, trigger, command), command);
+        this.commands.put(new CommandData(plugin, trigger, command, aliases), command);
+    }
+
+    public void registerCommand(ShelfsPlugin plugin, String trigger, Command command) {
+        this.registerCommand(plugin, trigger, command, (String) null);
     }
 
     public void unregisterCommand(String trigger) {
@@ -94,13 +99,15 @@ public class CommandManager extends ShelfsListenerAdapter {
         }
         String trigger = rawMessage[0].replaceFirst(this.commandPrefix, "");
         if (this.commands.values().stream().noneMatch(command -> this.isCorrectCommandType(command, channel))
-                || this.commands.keySet().stream().noneMatch(commandData -> commandData.trigger.equalsIgnoreCase(trigger))) {
+                || this.commands.keySet().stream().noneMatch(commandData -> commandData.trigger.equalsIgnoreCase(trigger) ||
+                Arrays.asList(commandData.aliases).contains(trigger))) {
             return;
         }
         CommandData commandData = this.commands
                 .keySet()
                 .stream()
-                .filter(commandDataStream -> commandDataStream.trigger.equalsIgnoreCase(trigger))
+                .filter(commandDataStream -> commandDataStream.trigger.equalsIgnoreCase(trigger) ||
+                        Arrays.asList(commandDataStream.aliases).contains(trigger))
                 .findAny()
                 .orElse(null);
         Command command = this.commands.get(commandData);
@@ -147,11 +154,13 @@ public class CommandManager extends ShelfsListenerAdapter {
         ShelfsPlugin plugin;
         String trigger;
         Command command;
+        String[] aliases;
 
-        CommandData(ShelfsPlugin plugin, String trigger, Command command) {
+        CommandData(ShelfsPlugin plugin, String trigger, Command command, String... aliases) {
             this.plugin = plugin;
             this.trigger = trigger;
             this.command = command;
+            this.aliases = aliases;
         }
     }
 }
