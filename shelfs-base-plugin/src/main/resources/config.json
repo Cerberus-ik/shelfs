@@ -1,4 +1,6 @@
 {
-  "pluginLoadRequiredRole": "0",
-  "pluginUnloadRequiredRole": "0"
+  "loadRoles": [
+  ],
+  "unloadRoles": [
+  ]
 }

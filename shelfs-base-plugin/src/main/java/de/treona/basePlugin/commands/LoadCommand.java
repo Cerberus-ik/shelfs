@@ -5,7 +5,6 @@ import de.treona.shelfs.api.plugin.ShelfsPlugin;
 import de.treona.shelfs.commands.GuildCommand;
 import de.treona.shelfs.commands.PrivateCommand;
 import de.treona.shelfs.permission.Permission;
-import de.treona.shelfs.permission.RolePermission;
 import net.dv8tion.jda.core.entities.*;
 
 import java.util.List;
@@ -16,8 +15,8 @@ public class LoadCommand implements GuildCommand, PrivateCommand {
 
     private Permission permission;
 
-    public LoadCommand(RolePermission rolePermission) {
-        this.permission = rolePermission;
+    public LoadCommand(Permission permission) {
+        this.permission = permission;
     }
 
     @Override
