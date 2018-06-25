@@ -1,12 +1,6 @@
 package de.treona.leagueTools.commands
 
 import de.treona.leagueTools.LeagueTools
-import de.treona.shelfs.api.Shelfs
-import de.treona.shelfs.commands.GuildCommand
-import de.treona.shelfs.commands.PrivateCommand
-import de.treona.shelfs.io.logger.LogLevel
-import de.treona.shelfs.io.logger.Logger
-import de.treona.shelfs.permission.Permission
 import net.dv8tion.jda.core.entities.*
 
 class ConfirmCommand : GuildCommand, PrivateCommand {
@@ -39,7 +33,7 @@ class ConfirmCommand : GuildCommand, PrivateCommand {
             return
         }
         if (!LeagueTools.registrationManager.isInRegistration(author)) {
-            message.channel.sendMessage("You firstly need to generate your verification code with ``${Shelfs.getCommandManager().commandPrefix}register <region> <summoner name>").queue()
+            message.channel.sendMessage("You firstly need to generate your verification code with ``${Shelfs.getCommandManager().commandPrefix}register <region> <summoner name>``").queue()
             return
         }
         if (!LeagueTools.registrationManager.valid(author)) {

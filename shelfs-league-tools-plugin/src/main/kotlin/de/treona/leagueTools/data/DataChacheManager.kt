@@ -1,8 +1,6 @@
 package de.treona.leagueTools.data
 
 import de.treona.leagueTools.LeagueTools
-import de.treona.shelfs.io.logger.LogLevel
-import de.treona.shelfs.io.logger.Logger
 import no.stelar7.api.l4j8.basic.constants.api.Platform
 import no.stelar7.api.l4j8.basic.constants.flags.ChampDataFlags
 import no.stelar7.api.l4j8.impl.raw.StaticAPI
@@ -21,8 +19,9 @@ class DataCacheManager {
 
     private val logger = Logger("Cache")
     val champions = HashMap<Int, StaticChampion>()
+    var latestVersion: String = "8.13.1"
 
-    private fun getLatestVersion(): String? {
+    private fun checkForLatestVersion(): String? {
         val url = URL("https://ddragon.leagueoflegends.com/api/versions.json")
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
@@ -44,7 +43,7 @@ class DataCacheManager {
         val scheduledExecutorService = ScheduledThreadPoolExecutor(1)
         scheduledExecutorService.scheduleAtFixedRate({
             this.logger.logMessage("Checking for updates...", LogLevel.INFO)
-            val latestVersion = this.getLatestVersion()
+            this.latestVersion = this.checkForLatestVersion()!!
             val latestBotVersion = LeagueTools.databaseManager.getLatestCachedVersion()
             if (latestBotVersion != null && latestBotVersion == latestVersion) {
                 this.logger.logMessage("Bot has the newest version cached.", LogLevel.INFO)
@@ -53,7 +52,7 @@ class DataCacheManager {
                     this.deserializeAndStoreAllChampions(LeagueTools.databaseManager.getCachedChampions(LeagueTools.databaseManager.getLatestVersionId()))
                     this.logger.logMessage("Loaded static champions from cache.", LogLevel.INFO)
                 }
-            } else if (latestVersion != null) {
+            } else {
                 latestVersion.let { LeagueTools.databaseManager.updateLatestVersion(it) }
                 this.logger.logMessage("Updated the current game version from: $latestBotVersion to: $latestVersion", LogLevel.INFO)
                 val versionId = LeagueTools.databaseManager.getLatestVersionId()

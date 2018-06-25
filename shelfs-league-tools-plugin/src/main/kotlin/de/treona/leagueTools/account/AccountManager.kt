@@ -1,7 +1,6 @@
 package de.treona.leagueTools.account
 
 import de.treona.leagueTools.LeagueTools
-import de.treona.shelfs.io.logger.Logger
 import no.stelar7.api.l4j8.basic.constants.api.Platform
 import no.stelar7.api.l4j8.pojo.summoner.Summoner
 
@@ -23,7 +22,7 @@ class AccountManager(var logger: Logger) {
         return Summoner.byName(summonerName, region) != null
     }
 
-    fun getDiscordSummoner(discordId: Long): DiscordSummoner {
+    fun getDiscordSummonerByDiscordId(discordId: Long): DiscordSummoner? {
         return LeagueTools.databaseManager.getDiscordSummonerByDiscordId(discordId)!!
     }
 

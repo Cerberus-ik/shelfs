@@ -10,7 +10,7 @@ buildscript {
 }
 
 group 'Cerberus'
-version 'v0.1.1'
+version 'v0.1.2'
 
 apply plugin: 'kotlin'
 apply plugin: 'java'
@@ -28,7 +28,7 @@ configurations {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile group: 'cerberus', name: 'shelfs-api', version: '0.5.3'
+    compile group: 'cerberus', name: 'shelfs-api', version: '0.6.0'
     extraLibraries 'com.github.stelar7:L4J8:V1.4.8'
     configurations.compile.extendsFrom(configurations.extraLibraries)
 }
