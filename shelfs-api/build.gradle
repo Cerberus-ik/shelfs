@@ -1,7 +1,7 @@
 apply plugin: 'maven-publish'
 apply plugin: 'java'
 group 'cerberus'
-version '0.6.0'
+version '0.6.1'
 
 sourceCompatibility = 1.8
 

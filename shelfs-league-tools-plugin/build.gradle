@@ -3,6 +3,9 @@ buildscript {
 
     repositories {
         mavenCentral()
+        jcenter()
+        mavenLocal()
+        maven { url 'https://jitpack.io' }
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -28,7 +31,7 @@ configurations {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile group: 'cerberus', name: 'shelfs-api', version: '0.6.0'
+    compile group: 'cerberus', name: 'shelfs-api', version: '0.6.1'
     extraLibraries 'com.github.stelar7:L4J8:V1.4.8'
     configurations.compile.extendsFrom(configurations.extraLibraries)
 }

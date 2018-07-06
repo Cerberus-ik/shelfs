@@ -7,8 +7,12 @@ import de.treona.leagueTools.data.DataCacheManager
 import de.treona.leagueTools.io.ConfigReader
 import de.treona.leagueTools.io.DatabaseManager
 import de.treona.leagueTools.util.RegionUtil
+import de.treona.shelfs.api.Shelfs
+import de.treona.shelfs.api.plugin.ShelfsPlugin
+import de.treona.shelfs.io.logger.Logger
 import no.stelar7.api.l4j8.basic.APICredentials
 import no.stelar7.api.l4j8.impl.L4J8
+
 
 class LeagueTools : ShelfsPlugin() {
 

@@ -1,7 +1,13 @@
 package de.treona.leagueTools.commands
 
 import de.treona.leagueTools.LeagueTools
+import de.treona.shelfs.api.Shelfs
 import net.dv8tion.jda.core.entities.*
+import de.treona.shelfs.commands.GuildCommand
+import de.treona.shelfs.commands.PrivateCommand
+import de.treona.shelfs.io.logger.LogLevel
+import de.treona.shelfs.io.logger.Logger
+import de.treona.shelfs.permission.Permission
 
 class ConfirmCommand : GuildCommand, PrivateCommand {
 

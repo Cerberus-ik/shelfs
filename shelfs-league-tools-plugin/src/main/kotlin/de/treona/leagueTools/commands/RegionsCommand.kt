@@ -1,12 +1,14 @@
 package de.treona.leagueTools.commands
 
 import de.treona.leagueTools.util.RegionUtil
+import de.treona.shelfs.commands.GuildCommand
+import de.treona.shelfs.commands.PrivateCommand
+import de.treona.shelfs.permission.Permission
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.entities.*
 import java.awt.Color
 
 class RegionsCommand : GuildCommand, PrivateCommand {
-
     override fun getName(): String {
         return "Regions"
     }
@@ -19,11 +21,11 @@ class RegionsCommand : GuildCommand, PrivateCommand {
         return null
     }
 
-    override fun execute(author: Member?, message: Message?, textChannel: TextChannel?) {
+    override fun execute(author: User?, message: Message?, textChannel: PrivateChannel?) {
         message?.let { this.sendRegionsMessage(it) }
     }
 
-    override fun execute(author: User?, message: Message?, textChannel: PrivateChannel?) {
+    override fun execute(author: Member?, message: Message?, textChannel: TextChannel?) {
         message?.let { this.sendRegionsMessage(it) }
     }
 

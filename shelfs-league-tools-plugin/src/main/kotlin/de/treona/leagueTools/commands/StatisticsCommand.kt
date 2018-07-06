@@ -4,6 +4,9 @@ import de.treona.leagueTools.LeagueTools
 import de.treona.leagueTools.account.LoadedDiscordSummoner
 import de.treona.leagueTools.util.RegionUtil
 import de.treona.leagueTools.util.SummonerUtil
+import de.treona.shelfs.commands.GuildCommand
+import de.treona.shelfs.commands.PrivateCommand
+import de.treona.shelfs.permission.Permission
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.entities.*
 import no.stelar7.api.l4j8.basic.constants.types.GameQueueType

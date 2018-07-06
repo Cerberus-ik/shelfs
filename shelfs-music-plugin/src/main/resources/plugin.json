@@ -1,7 +1,7 @@
 {
   "author": "Cerberus",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "name": "Music-Plugin",
-  "main": "de.treona.musicPlugin.Main",
+  "main": "de.treona.musicPlugin.Music",
   "pluginDescription": "A fully featured music bot for your pleasure"
 }

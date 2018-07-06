@@ -1,5 +1,5 @@
 group 'Cerberus'
-version 'v1.5.3'
+version 'v1.5.4'
 
 apply plugin: 'java'
 

@@ -2,6 +2,10 @@ package de.treona.leagueTools.commands
 
 import de.treona.leagueTools.LeagueTools
 import de.treona.leagueTools.account.LoadedDiscordSummoner
+import de.treona.shelfs.api.Shelfs
+import de.treona.shelfs.commands.GuildCommand
+import de.treona.shelfs.commands.PrivateCommand
+import de.treona.shelfs.permission.Permission
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.entities.*
 import no.stelar7.api.l4j8.pojo.summoner.Summoner

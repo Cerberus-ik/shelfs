@@ -16,7 +16,7 @@ import de.treona.shelfs.io.logger.LogLevel;
 import de.treona.shelfs.io.resource.ResourceLoader;
 import net.dv8tion.jda.core.entities.Game;
 
-public class Main extends ShelfsPlugin {
+public class Music extends ShelfsPlugin {
 
     @Override
     public void onEnable() {
