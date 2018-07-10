@@ -1,0 +1,16 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="de.treona.shelfs.io.logger.layouts.BasicLayout"/>
+    </appender>
+
+    <logger name="de.treona.shelfs" level="info"
+            additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+    </root>
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+</configuration>

@@ -5,3 +5,6 @@
 *.properties
 *.jar
 *iml
+
+#Ignored files
+!logback.xml
