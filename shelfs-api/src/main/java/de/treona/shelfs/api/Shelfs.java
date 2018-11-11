@@ -85,7 +85,7 @@ public final class Shelfs {
     }
 
     public static String getVersion() {
-        return "0.6.1";
+        return "0.6.2";
     }
 
     public static JDA getJda() {

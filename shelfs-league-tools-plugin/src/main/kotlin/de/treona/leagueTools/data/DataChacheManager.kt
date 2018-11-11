@@ -3,9 +3,7 @@ package de.treona.leagueTools.data
 import de.treona.leagueTools.LeagueTools
 import de.treona.shelfs.io.logger.LogLevel
 import de.treona.shelfs.io.logger.Logger
-import no.stelar7.api.l4j8.basic.constants.api.Platform
-import no.stelar7.api.l4j8.basic.constants.flags.ChampDataFlags
-import no.stelar7.api.l4j8.impl.raw.StaticAPI
+import no.stelar7.api.l4j8.impl.raw.DDragonAPI
 import no.stelar7.api.l4j8.pojo.staticdata.champion.StaticChampion
 import org.apache.commons.io.IOUtils
 import org.json.JSONArray
@@ -73,7 +71,7 @@ class DataCacheManager {
     }
 
     private fun getChampions(version: String): HashMap<Int, String> {
-        val champions = StaticAPI.getInstance().getChampions(Platform.EUW1, mutableSetOf(ChampDataFlags.ALL), version, "en_US")
+        val champions = DDragonAPI.getInstance().getChampions(version, "en_US")
         val base64Data = HashMap<Int, String>()
         champions.forEach { championId, staticChampion ->
             base64Data[championId] = this.serializeObject(staticChampion)

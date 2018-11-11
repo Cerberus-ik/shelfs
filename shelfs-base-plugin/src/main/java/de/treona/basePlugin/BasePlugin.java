@@ -7,9 +7,27 @@ import de.treona.shelfs.permission.GuildRolePermission;
 import net.dv8tion.jda.core.entities.Role;
 import org.json.JSONObject;
 
-import java.util.HashMap;
+import java.util.*;
 
 public class BasePlugin extends ShelfsPlugin {
+
+    private class test{
+        public int points;
+        public String name;
+
+        public test(int points, String name) {
+            this.points = points;
+            this.name = name;
+        }
+
+        public int getPoints() {
+            return points;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
 
     @Override
     public void onEnable() {

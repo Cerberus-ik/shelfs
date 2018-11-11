@@ -1,7 +1,7 @@
 apply plugin: 'maven-publish'
 apply plugin: 'java'
 group 'cerberus'
-version '0.6.1'
+version '0.6.2'
 
 sourceCompatibility = 1.8
 
@@ -21,7 +21,7 @@ dependencies {
     compile 'com.sedmelluq:jda-nas:1.0.5'
     compile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
     /* Kotlin dependencies */
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.50"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.51"
     compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.22.5'
 }
 

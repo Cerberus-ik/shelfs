@@ -172,7 +172,7 @@ class DatabaseManager(private val logger: Logger) {
                 return if (!it.next())
                     null
                 else
-                    DiscordSummoner(Shelfs.getJda().getUserById(discordId), it.getLong(1), Platform.getFromCode(it.getString(2)).get())
+                    DiscordSummoner(Shelfs.getJda().getUserById(discordId), it.getLong(1), Platform.fromString(it.getString(2)).get())
             }
         }
     }

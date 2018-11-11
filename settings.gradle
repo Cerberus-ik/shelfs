@@ -6,4 +6,5 @@ include 'shelfs-update-plugin'
 include 'shelfs-league-tools-plugin'
 include 'shelfs-music-plugin'
 include 'shelfs-base-plugin'
+include 'shelfs-a9-plugin'
 

@@ -119,17 +119,21 @@ public class CommandManager extends ShelfsListenerAdapter {
             throw new NullPointerException("Command data is null.");
         }
         if (channel instanceof TextChannel) {
-            ((GuildCommand) command).execute(message.getMember(), message, (TextChannel) channel);
-            Shelfs.getJda().getRegisteredListeners().forEach(listener -> {
-                ListenerAdapter adapter = (ListenerAdapter) listener;
-                adapter.onEvent(new GuildCommandEvent(channel.getJDA(), (GuildCommand) command, commandData.plugin, message.getAuthor(), message.getGuild()));
-            });
+            new Thread(() -> {
+                ((GuildCommand) command).execute(message.getMember(), message, (TextChannel) channel);
+                Shelfs.getJda().getRegisteredListeners().forEach(listener -> {
+                    ListenerAdapter adapter = (ListenerAdapter) listener;
+                    adapter.onEvent(new GuildCommandEvent(channel.getJDA(), (GuildCommand) command, commandData.plugin, message.getAuthor(), message.getGuild()));
+                });
+            }).start();
         } else {
-            ((PrivateCommand) command).execute(message.getAuthor(), message, (PrivateChannel) channel);
-            Shelfs.getJda().getRegisteredListeners().forEach(listener -> {
-                ListenerAdapter adapter = (ListenerAdapter) listener;
-                adapter.onEvent(new PrivateCommandEvent(channel.getJDA(), (PrivateCommand) command, commandData.plugin, message.getAuthor()));
-            });
+            new Thread(() -> {
+                ((PrivateCommand) command).execute(message.getAuthor(), message, (PrivateChannel) channel);
+                Shelfs.getJda().getRegisteredListeners().forEach(listener -> {
+                    ListenerAdapter adapter = (ListenerAdapter) listener;
+                    adapter.onEvent(new PrivateCommandEvent(channel.getJDA(), (PrivateCommand) command, commandData.plugin, message.getAuthor()));
+                });
+            }).start();
         }
     }
 

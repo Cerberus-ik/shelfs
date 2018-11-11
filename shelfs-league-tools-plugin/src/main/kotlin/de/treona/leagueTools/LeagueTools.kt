@@ -20,6 +20,7 @@ class LeagueTools : ShelfsPlugin() {
         if (config == null || config == defaultConfig)
             super.writeDefaultConfig()
         val api = L4J8(APICredentials(super.getConfig().getString("api-key"), super.getConfig().getString("tournament-key")))
+
         RegionUtil()
         databaseManager.setup(ConfigReader.getDatabaseCredentials(super.getConfig().toString()))
         dataCacheManager.start()
@@ -27,6 +28,7 @@ class LeagueTools : ShelfsPlugin() {
         Shelfs.getCommandManager().registerCommand(this, "confirm", ConfirmCommand())
         Shelfs.getCommandManager().registerCommand(this, "regions", RegionsCommand())
         Shelfs.getCommandManager().registerCommand(this, "me", MeCommand(), "league")
+        Shelfs.getCommandManager().registerCommand(this, "status", StatusCommand())
         Shelfs.getCommandManager().registerCommand(this, "statistics", StatisticsCommand(), "stats")
     }
 

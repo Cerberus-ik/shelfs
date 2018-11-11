@@ -1,0 +1,7 @@
+{
+  "author": "Cerberus",
+  "version": "0.1.0",
+  "name": "Update-Plugin",
+  "main": "de.treona.a9.Main",
+  "pluginDescription": "A9 private plugin"
+}

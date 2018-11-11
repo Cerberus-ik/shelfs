@@ -50,7 +50,7 @@ class RegisterCommand : GuildCommand, PrivateCommand {
         if (args.size < 2) {
             message.channel.sendMessage("Use: ${Shelfs.getCommandManager().commandPrefix}register ``region`` ``Summoner Name``").queue()
         }
-        val region = Platform.getFromCode(args[1])
+        val region = Platform.fromString(args[1])
         if (region == null || !region.isPresent) {
             message.channel.sendMessage("``" + args[1] + "`` is an unknown region.").queue()
             return

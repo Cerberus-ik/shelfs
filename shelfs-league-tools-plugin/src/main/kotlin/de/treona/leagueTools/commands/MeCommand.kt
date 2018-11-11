@@ -2,6 +2,7 @@ package de.treona.leagueTools.commands
 
 import de.treona.leagueTools.LeagueTools
 import de.treona.leagueTools.account.LoadedDiscordSummoner
+import de.treona.leagueTools.util.LeagueUtil
 import de.treona.shelfs.api.Shelfs
 import de.treona.shelfs.commands.GuildCommand
 import de.treona.shelfs.commands.PrivateCommand
@@ -71,7 +72,7 @@ class MeCommand : GuildCommand, PrivateCommand {
         val leagueEntries = summoner.leagueEntry
         val fields = arrayListOf<MessageEmbed.Field>()
         leagueEntries.forEach {
-            fields.add(MessageEmbed.Field(it.queueType.name, "Rank: ${it.tierDivisionType} (${it.leaguePoints}lp)", true))
+            fields.add(MessageEmbed.Field(it.queueType.name, "Rank: ${LeagueUtil.parseTierDivision(it.tierDivisionType.name)} (${it.leaguePoints}lp)", true))
         }
         return fields
     }
