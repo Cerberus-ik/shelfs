@@ -1,0 +1,200 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/root.json",
+  "type": "object",
+  "title": "The Root Schema",
+  "required": [
+    "dynamicLoad",
+    "currentGame",
+    "onlineStatus",
+    "pluginDirectory",
+    "token",
+    "commandPrefix",
+    "io",
+    "libraries",
+    "database"
+  ],
+  "properties": {
+    "dynamicLoad": {
+      "$id": "#/properties/dynamicLoad",
+      "type": "boolean",
+      "title": "The Dynamicload Schema",
+      "default": false,
+      "examples": [
+        false
+      ]
+    },
+    "currentGame": {
+      "$id": "#/properties/currentGame",
+      "type": "string",
+      "title": "The Currentgame Schema",
+      "default": "",
+      "examples": [
+        "Shelfs"
+      ],
+      "pattern": ""
+    },
+    "onlineStatus": {
+      "$id": "#/properties/onlineStatus",
+      "type": "string",
+      "title": "The Onlinestatus Schema",
+      "default": "",
+      "examples": [
+        "Online"
+      ],
+      "pattern": ""
+    },
+    "pluginDirectory": {
+      "$id": "#/properties/pluginDirectory",
+      "type": "string",
+      "title": "The Plugindirectory Schema",
+      "default": "",
+      "examples": [
+        "plugins"
+      ],
+      "pattern": ""
+    },
+    "token": {
+      "$id": "#/properties/token",
+      "type": "string",
+      "title": "The Token Schema",
+      "default": "",
+      "examples": [
+        "token"
+      ],
+      "pattern": ""
+    },
+    "commandPrefix": {
+      "$id": "#/properties/commandPrefix",
+      "type": "string",
+      "title": "The Commandprefix Schema",
+      "default": "",
+      "examples": [
+        "!"
+      ],
+      "pattern": ""
+    },
+    "io": {
+      "$id": "#/properties/io",
+      "type": "string",
+      "title": "The Io Schema",
+      "default": "",
+      "examples": [
+        "MySQL"
+      ],
+      "pattern": ""
+    },
+    "libraries": {
+      "$id": "#/properties/libraries",
+      "type": "array",
+      "title": "The Libraries Schema",
+      "items": {
+        "$id": "#/properties/libraries/items",
+        "type": "object",
+        "title": "The Items Schema",
+        "required": [
+          "group",
+          "artifact",
+          "version"
+        ],
+        "properties": {
+          "group": {
+            "$id": "#/properties/libraries/items/properties/group",
+            "type": "string",
+            "title": "The Group Schema",
+            "default": "",
+            "examples": [
+              "org.jetbrains.kotlin"
+            ],
+            "pattern": ""
+          },
+          "artifact": {
+            "$id": "#/properties/libraries/items/properties/artifact",
+            "type": "string",
+            "title": "The Artifact Schema",
+            "default": "",
+            "examples": [
+              "kotlin-stdlib-jdk8"
+            ],
+            "pattern": ""
+          },
+          "version": {
+            "$id": "#/properties/libraries/items/properties/version",
+            "type": "string",
+            "title": "The Version Schema",
+            "default": "",
+            "examples": [
+              "1.3.0"
+            ],
+            "pattern": ""
+          }
+        }
+      }
+    },
+    "database": {
+      "$id": "#/properties/database",
+      "type": "object",
+      "title": "The Database Schema",
+      "required": [
+        "ioPassword",
+        "ioUser",
+        "ioDb",
+        "ioHost",
+        "ioPort"
+      ],
+      "properties": {
+        "ioPassword": {
+          "$id": "#/properties/database/properties/ioPassword",
+          "type": "string",
+          "title": "The Iopassword Schema",
+          "default": "",
+          "examples": [
+            ""
+          ],
+          "pattern": ""
+        },
+        "ioUser": {
+          "$id": "#/properties/database/properties/ioUser",
+          "type": "string",
+          "title": "The Iouser Schema",
+          "default": "",
+          "examples": [
+            ""
+          ],
+          "pattern": ""
+        },
+        "ioDb": {
+          "$id": "#/properties/database/properties/ioDb",
+          "type": "string",
+          "title": "The Iodb Schema",
+          "default": "",
+          "examples": [
+            ""
+          ],
+          "pattern": ""
+        },
+        "ioHost": {
+          "$id": "#/properties/database/properties/ioHost",
+          "type": "string",
+          "title": "The Iohost Schema",
+          "default": "",
+          "examples": [
+            ""
+          ],
+          "pattern": ""
+        },
+        "ioPort": {
+          "$id": "#/properties/database/properties/ioPort",
+          "type": "string",
+          "title": "The Ioport Schema",
+          "default": "",
+          "examples": [
+            "3306"
+          ],
+          "pattern": ""
+        }
+      }
+    }
+  }
+}

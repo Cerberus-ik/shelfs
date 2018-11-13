@@ -12,6 +12,7 @@ import de.treona.shelfs.config.ConfigManager;
 import de.treona.shelfs.io.IOManager;
 import de.treona.shelfs.io.IOType;
 import de.treona.shelfs.io.database.MySQLIOManager;
+import de.treona.shelfs.io.dependencies.DependencyManager;
 import de.treona.shelfs.io.logger.LogLevel;
 import de.treona.shelfs.io.logger.Logger;
 import net.dv8tion.jda.core.AccountType;
@@ -55,6 +56,13 @@ public final class Shelfs {
         pluginManager.loadPlugins();
     }
 
+    private static void loadDependencies() {
+        logger.logMessage("Loading dependencies...", LogLevel.INFO);
+        DependencyManager dependencyManager = new DependencyManager(getConfig());
+        dependencyManager.loadDependencies();
+    }
+
+
     public static void start() {
         logger.logMessage("Starting...", LogLevel.INFO);
         try {
@@ -64,10 +72,11 @@ public final class Shelfs {
                     .addEventListener(new CommandListener(configManager.getConfig().commandPrefix))
                     .addEventListener(new ReactionMessageListener())
                     .setAudioSendFactory(new NativeAudioSendFactory())
-                    .buildBlocking());
+                    .build().awaitReady());
         } catch (LoginException | InterruptedException e) {
             e.printStackTrace();
         }
+        loadDependencies();
         loadPlugins();
         logger.logMessage("Finished startup sequence!", LogLevel.INFO);
     }
@@ -85,7 +94,7 @@ public final class Shelfs {
     }
 
     public static String getVersion() {
-        return "0.6.2";
+        return "0.6.5";
     }
 
     public static JDA getJda() {

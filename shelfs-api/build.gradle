@@ -1,7 +1,7 @@
 apply plugin: 'maven-publish'
 apply plugin: 'java'
 group 'cerberus'
-version '0.6.2'
+version '0.6.5'
 
 sourceCompatibility = 1.8
 
@@ -13,16 +13,16 @@ repositories {
 
 dependencies {
     compile group: 'org.everit.json', name: 'org.everit.json.schema', version: '1.5.1'
-    compile 'net.dv8tion:JDA:3.6.0_355'
+    compile ('net.dv8tion:JDA:3.8.1_437'){
+        exclude group: 'club.minnced', module: 'opus-java'
+    }
+    compile group: 'club.minnced', name: 'opus-java', version: '1.0.2'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.8.2'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.1.0'
     compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.9-rc'
-    compile 'com.sedmelluq:jda-nas:1.0.5'
+    compile 'com.sedmelluq:jda-nas:1.0.6'
     compile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
-    /* Kotlin dependencies */
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.51"
-    compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.22.5'
 }
 
 task sourceJar(type: Jar) {
