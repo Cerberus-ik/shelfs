@@ -1,9 +1,12 @@
 package de.treona.shelfs.config;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import de.treona.shelfs.api.Shelfs;
 import de.treona.shelfs.api.exceptions.InvalidConfigException;
 import de.treona.shelfs.io.IOType;
 import de.treona.shelfs.io.database.DatabaseCredentials;
+import de.treona.shelfs.io.dependencies.Dependency;
 import de.treona.shelfs.io.logger.LogLevel;
 import de.treona.shelfs.io.resource.JSONBeautifier;
 import de.treona.shelfs.io.resource.ResourceLoader;
@@ -16,16 +19,23 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.*;
+import java.util.List;
 
 public class ConfigManager {
 
     private Config config;
-    private File configFile;
-    private File directory;
+    private final File configFile;
+    private final File directory;
 
     public ConfigManager() {
         this.configFile = new File("config/config.json");
         this.directory = new File("config/");
+
+        final File libsDirectors = new File("libs");
+        if(!libsDirectors.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            libsDirectors.mkdirs();
+        }
     }
 
     public void load() {
@@ -46,6 +56,7 @@ public class ConfigManager {
             this.config.getClass().getDeclaredField("currentGame").set(config, jsonObject.getString("currentGame"));
             this.config.getClass().getDeclaredField("onlineStatus").set(config, OnlineStatus.fromKey(jsonObject.getString("onlineStatus")));
             this.config.getClass().getDeclaredField("ioType").set(config, IOType.getTypeByName(jsonObject.getString("io")));
+            this.config.getClass().getDeclaredField("libraries").set(config, new Gson().fromJson(jsonObject.getJSONArray("libraries").toString(), new TypeToken<List<Dependency>>(){}.getType()));
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (NoSuchFieldException e) {
@@ -133,7 +144,7 @@ public class ConfigManager {
     }
 
     private boolean isConfigValid(JSONObject jsonObject) {
-        try (InputStream inputStream = getClass().getResourceAsStream("/schemas/configSchema-1.1.json")) {
+        try (InputStream inputStream = getClass().getResourceAsStream("/schemas/configSchema-1.2.json")) {
             JSONObject rawSchema = new JSONObject(new JSONTokener(inputStream));
             Schema schema = SchemaLoader.load(rawSchema);
             schema.validate(jsonObject);

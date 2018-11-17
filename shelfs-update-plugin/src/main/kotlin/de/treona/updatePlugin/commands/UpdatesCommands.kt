@@ -5,7 +5,8 @@ import de.treona.shelfs.commands.PrivateCommand
 import de.treona.shelfs.permission.Permission
 import de.treona.shelfs.permission.PermissionUtil
 import de.treona.shelfs.permission.StringPermission
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import net.dv8tion.jda.core.entities.*
 
 class UpdatesCommands : PrivateCommand, GuildCommand {
@@ -44,8 +45,7 @@ class UpdatesCommands : PrivateCommand, GuildCommand {
             PermissionUtil.addPermission(user, StringPermission("update.plugins"))
             "You will now receive plugin updates."
         }
-        @Suppress("EXPERIMENTAL_FEATURE_WARNING")
-        launch {
+        GlobalScope.launch {
             val privateChannel = user.openPrivateChannel().complete()
             privateChannel.sendMessage(message).complete()
         }

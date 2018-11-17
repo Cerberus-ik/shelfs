@@ -80,6 +80,7 @@ public class PluginLoader {
             Shelfs.getLogger().logMessage("Plugin: " + file.getName() + " has no valid main class.", LogLevel.ERROR);
         } finally {
             try {
+                assert classLoader != null;
                 classLoader.close();
             } catch (Exception ignore) {
             }

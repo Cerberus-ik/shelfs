@@ -5,8 +5,9 @@ import de.treona.shelfs.api.plugin.ShelfsPlugin
 import de.treona.shelfs.permission.PermissionUtil
 import de.treona.shelfs.permission.StringPermission
 import de.treona.updatePlugin.commands.UpdatesCommands
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.dv8tion.jda.core.EmbedBuilder
 import org.json.JSONArray
 import org.json.JSONObject
@@ -15,8 +16,7 @@ import org.json.JSONObject
 class Main : ShelfsPlugin() {
     override fun onEnable() {
         Shelfs.getCommandManager().registerCommand(this, "updates", UpdatesCommands())
-        @Suppress("EXPERIMENTAL_FEATURE_WARNING")
-        launch {
+        GlobalScope.launch {
             delay(5000)
             checkForUpdates()
             saveConfig()
@@ -59,8 +59,7 @@ class Main : ShelfsPlugin() {
         }
         val message = messageBuilder.build()
         PermissionUtil.getUsersWithPermission(StringPermission("update.plugins")).forEach {
-            @Suppress("EXPERIMENTAL_FEATURE_WARNING")
-            launch {
+            GlobalScope.launch {
                 val privateChannel = it.openPrivateChannel().complete()
                 privateChannel.sendMessage(message).queue()
             }
