@@ -30,6 +30,7 @@ class LeagueTools : ShelfsPlugin() {
         Shelfs.getCommandManager().registerCommand(this, "me", MeCommand(), "league")
         Shelfs.getCommandManager().registerCommand(this, "status", StatusCommand())
         Shelfs.getCommandManager().registerCommand(this, "statistics", StatisticsCommand(), "stats")
+        Shelfs.getCommandManager().registerCommand(this, "vision", VisionCommand())
     }
 
     companion object {
