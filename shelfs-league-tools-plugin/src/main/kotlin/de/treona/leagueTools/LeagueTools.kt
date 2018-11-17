@@ -27,7 +27,7 @@ class LeagueTools : ShelfsPlugin() {
         Shelfs.getCommandManager().registerCommand(this, "register", RegisterCommand())
         Shelfs.getCommandManager().registerCommand(this, "confirm", ConfirmCommand())
         Shelfs.getCommandManager().registerCommand(this, "regions", RegionsCommand())
-        Shelfs.getCommandManager().registerCommand(this, "me", MeCommand(), "league")
+        Shelfs.getCommandManager().registerCommand(this, "me", MeCommand(), "league", "lol")
         Shelfs.getCommandManager().registerCommand(this, "status", StatusCommand())
         Shelfs.getCommandManager().registerCommand(this, "statistics", StatisticsCommand(), "stats")
         Shelfs.getCommandManager().registerCommand(this, "vision", VisionCommand())

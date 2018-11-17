@@ -20,11 +20,11 @@ class MeCommand : GuildCommand, PrivateCommand {
     }
 
     override fun getName(): String {
-        return "Confirm"
+        return "Me"
     }
 
     override fun getDescription(): String {
-        return "Let's you confirm the registration after you set the verification code."
+        return "Shows you the basic information about a summoner"
     }
 
     override fun execute(author: Member?, message: Message?, textChannel: TextChannel?) {

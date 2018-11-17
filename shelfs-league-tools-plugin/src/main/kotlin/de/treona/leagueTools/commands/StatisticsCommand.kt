@@ -100,7 +100,7 @@ class StatisticsCommand : GuildCommand, PrivateCommand {
 
     private fun buildWinRateField(loadedDiscordSummoner: LoadedDiscordSummoner, games: MutableList<Match>): MessageEmbed.Field {
         val wins = games.stream().filter{match: Match? ->
-            val participant = match?.participants?.find { it.participantId == match.participantIdentities.find { it.summonerId == loadedDiscordSummoner.summoner.summonerId }?.participantId }
+            val participant = match?.participants?.find { it.participantId == match.participantIdentities.find { participantIdentity -> participantIdentity.summonerId == loadedDiscordSummoner.summoner.summonerId }?.participantId }
             match?.didWin(participant)!!
         }.count()
         return MessageEmbed.Field("Win rate in the past ${games.size} games", (wins/games.size).toString(), false)
